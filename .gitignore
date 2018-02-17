@@ -2,3 +2,8 @@ CMakeLists.txt
 cmake-build-debug/
 .idea/
 manuals/
+*.c.o
+*.elf
+*.hex
+.deps/
+Makefile
