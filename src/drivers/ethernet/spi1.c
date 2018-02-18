@@ -1,23 +1,16 @@
 #include <pic32mx.h>
-
-#define SS1 0x40
-#define SPI1TXIF 0x1000000
-#define SPI1RXIF 0x2000000
-#define SPI1EIF 0x800000
+#include "spi1.h"
 
 void enable_spi(void) {
-  IECCLR(0) = SPI1TXIF;
   IECCLR(0) = SPI1RXIF;
   IECCLR(0) = SPI1EIF;
 
-  IFSCLR(0) = SPI1TXIF;
   IFSCLR(0) = SPI1RXIF;
   IFSCLR(0) = SPI1EIF;
 
   IPCCLR(5) = 0x1f000000;
   IPCSET(5) = 0xd000000;
-  
-  IECSET(0) = SPI1TXIF;
+
   IECSET(0) = SPI1RXIF;
   IECSET(0) = SPI1EIF;
 
@@ -30,9 +23,11 @@ void enable_spi(void) {
 }
 
 void spi_transfer(int bits) {
-  do {
-    if (SPI1STAT & PIC32_SPISTAT_SPITBE) {
-      SPI1BUF = bits;
-    }
-  } while (!(SPI1STAT & PIC32_SPISTAT_SPITBE));
+  SPI1BUF = bits;
+  while (!(SPI1STAT & PIC32_SPISTAT_SPITBE)); // Make sure transmit buffer is empty
+}
+
+void spi_receive(volatile int* data) {
+  while (SPI1STAT & PIC32_SPISTAT_SPITBE);
+  *data = SPI1BUF;
 }

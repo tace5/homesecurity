@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "drivers/ethernet.c"
+#include "drivers/ethernet/spi1.c"
 
 int main() {
   int i = 0;
