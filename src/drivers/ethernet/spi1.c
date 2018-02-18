@@ -22,7 +22,7 @@ void enable_spi(void) {
   SPI1CONSET = PIC32_SPICON_MSTEN | PIC32_SPICON_ON;
 }
 
-void spi_transfer(int bits) {
+void spi_transfer(int data) {
   SPI1BUF = bits;
   while (!(SPI1STAT & PIC32_SPISTAT_SPITBE)); // Make sure transmit buffer is empty
 }

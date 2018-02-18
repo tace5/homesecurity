@@ -5,5 +5,5 @@
 #define SPI1EIF 0x800000
 
 void enable_spi(void);
-void spi_transfer(int bits);
+void spi_transfer(int data);
 void spi_receive(volatile int* data);
