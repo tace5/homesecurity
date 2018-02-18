@@ -1,6 +1,7 @@
 #include <stdio.h>
+#include "drivers/ethernet.c"
 
 int main() {
-  printf("Hello, World!\n");
+  int i = 0;
   return 0;
 }

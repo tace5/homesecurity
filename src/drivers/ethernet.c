@@ -1,0 +1,38 @@
+#include <pic32mx.h>
+
+#define SS1 0x40
+#define SPI1TXIF 0x1000000
+#define SPI1RXIF 0x2000000
+#define SPI1EIF 0x800000
+
+void enable_spi(void) {
+  IECCLR(0) = SPI1TXIF;
+  IECCLR(0) = SPI1RXIF;
+  IECCLR(0) = SPI1EIF;
+
+  IFSCLR(0) = SPI1TXIF;
+  IFSCLR(0) = SPI1RXIF;
+  IFSCLR(0) = SPI1EIF;
+
+  IPCCLR(5) = 0x1f000000;
+  IPCSET(5) = 0xd000000;
+  
+  IECSET(0) = SPI1TXIF;
+  IECSET(0) = SPI1RXIF;
+  IECSET(0) = SPI1EIF;
+
+  TRISDCLR = SS1;
+
+  SPI1CON = 0;
+  SPI1BRG = 0x2;
+  SPI1STATCLR = PIC32_SPISTAT_SPIROV;
+  SPI1CONSET = PIC32_SPICON_MSTEN | PIC32_SPICON_ON;
+}
+
+void spi_transfer(int bits) {
+  do {
+    if (SPI1STAT & PIC32_SPISTAT_SPITBE) {
+      SPI1BUF = bits;
+    }
+  } while (!(SPI1STAT & PIC32_SPISTAT_SPITBE));
+}
