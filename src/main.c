@@ -1,7 +1,9 @@
 #include <stdio.h>
-#include "drivers/ethernet/spi1.c"
+#include "drivers/ethernet/eth_instructions.h"
+#include "drivers/ethernet/eth_control_registers.h"
 
 int main() {
-  int i = 0;
+  write_control_register(ECON1, 0x3);
+  write_control_register(MAA)
   return 0;
 }
