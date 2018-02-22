@@ -91,3 +91,48 @@
 #define EFLOCON   0x17
 #define EPAUSL    0x18
 #define EPAUSH    0x19
+
+/*
+  Register fields
+*/
+
+// EIE
+#define INTIE   0x80;
+#define PKTIE   0x40;
+#define DMAIE   0x20;
+#define LINKIE  0x10;
+#define TXIE    0x8;
+#define TXERIE  0x2;
+#define RXERIE  0x1;
+
+// EIR
+#define PKTIF   0x40;
+#define DMAIF   0x20;
+#define LINKIF  0x10;
+#define TXIF    0x80;
+#define TXERIF  0x20;
+#define RXERIF  0x10;
+
+// ESTAT
+#define INT     0x80;
+#define BUFER   0x40;
+#define LATECOL 0x10;
+#define RXBUSY  0x4;
+#define TXABRT  0x2;
+#define CLKRDY  0x1;
+
+// ECON2
+#define AUTOINC 0x80;
+#define PKTDEC  0x40;
+#define PWRSV   0x20;
+#define VRPS    0x8;
+
+// ECON1
+#define TXRST   0x80;
+#define RXRST   0x40;
+#define DMAST   0x20;
+#define CSUMEN  0x10;
+#define TXRTS   0x8;
+#define RXEN    0x4;
+#define BSEL1   0x2;
+#define BSEL0   0x1;

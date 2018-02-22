@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "spi1.h"
-#include "eth_control_registers.h"
+#include "enc28j60_control_registers.h"
 
 uint8_t read_control_register(uint8_t eth_register) {
   uint8_t register_data;
