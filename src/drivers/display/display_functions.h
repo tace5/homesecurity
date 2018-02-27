@@ -12,12 +12,16 @@
 
 /* Declare display-related functions from mipslabfunc.c */
 void display_init(void);
+
 void display_string(int line, char *s);
+
 void display_update(void);
+
 uint8_t spi_send_recv(uint8_t data);
 
 /* Declare lab-related functions from mipslabfunc.c */
-char * itoaconv( int num );
+char *itoaconv(int num);
+
 void quicksleep(int cyc);
 
 /* Declare display_debug - a function to help debugging.
@@ -32,7 +36,7 @@ void quicksleep(int cyc);
    repeated calls to display_image; display_image overwrites
    about half of the digits shown by display_debug.
 */
-void display_debug( volatile int * const addr );
+void display_debug(volatile int *const addr);
 
 void display_setup(void);
 
