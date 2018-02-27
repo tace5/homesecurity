@@ -134,5 +134,29 @@
 #define CSUMEN  0x10;
 #define TXRTS   0x8;
 #define RXEN    0x4;
-#define BSEL1   0x2;
-#define BSEL0   0x1;
+#define BSEL    0x3;
+
+// ERXFCON
+#define UCEN    0x80;
+#define ANDOR   0x40;
+
+// MACON1
+#define TXPAUS  0x8;
+#define RXPAUS  0x4;
+#define PASSALL 0x2;
+#define MARXEN  0x1;
+
+// MACON3
+#define PADCFG2 0x80;
+#define PADCFG1 0x40;
+#define PADCFG0 0x20;
+#define TXCRCEN 0x10;
+#define PHDREN  0x8;
+#define HFRMEN  0x4;
+#define FRMLNEN 0x2;
+#define FULDPX  0x1;
+
+// MACON4
+#define DEFER   0x40;
+#define BPEN    0x20;
+#define NOPKOFF 0x10;

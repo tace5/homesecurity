@@ -1,5 +1,5 @@
 
-#define SS1 0x40
+#define SS1 0x80
 #define SPI1TXIF 0x1000000
 #define SPI1RXIF 0x2000000
 #define SPI1EIF 0x800000

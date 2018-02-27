@@ -15,8 +15,8 @@ void spi1_init(void) {
   IECSET(0) = SPI1RXIF;
   IECSET(0) = SPI1EIF;
 
-  TRISDCLR = SS1;
-  PORTDSET = SS1;
+  TRISECLR = SS1;
+  PORTESET = SS1;
 
   SPI1CON = 0;
   SPI1BRG = 0x2; // SCK = 13.33 MHz
