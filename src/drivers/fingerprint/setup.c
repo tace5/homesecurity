@@ -16,7 +16,7 @@ void init() {
 
 void config_uart() {  // Using UART2 on PIN 39 (RX) and PIN 40 (TX)
     U2BRGSET = gen_UxBRG(80000000, 57600);
-    U2STASET = 0x5400;  // Status and Control bits : 0101 0100 0000 0000
+    U2STASET = 0x1480;  // Status and Control bits : 0001 0100 1000 0000
     U2MODESET = 0x80A0;  // MODE bits : 1000 0000 1010 0000
 }
 
@@ -31,7 +31,7 @@ void setup() {
 }
 
 void register_interrupts() {
-    IECSET(1) = 0x600;  // Enable UART Receiver and Transmitter interrupts
+    IECSET(1) = 0x200;  // Enable UART Receiver interrupt
 }
 
 void handle_interrupt() {
