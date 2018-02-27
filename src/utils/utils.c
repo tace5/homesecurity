@@ -5,7 +5,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 #else
-//#include <unistd.h>
+//#include <unistd.h> TODO - figure out why #ifdef doesn't work
 #endif
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
@@ -15,7 +15,7 @@ void timeout(int ms){
 #ifdef _WIN32
     Sleep(ms);
 #else
-    //usleep(ms*1000);  /* sleep for 100 milliSeconds */
+    //usleep(ms*1000);  /* sleep for 100 milliSeconds */ TODO
 #endif
 }
 
