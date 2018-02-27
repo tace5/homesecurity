@@ -1,9 +1,26 @@
 #include <stdio.h>
+#include <stdint.h>   /* Declarations of uint_32 and the like */
+#include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "drivers/ethernet/enc28j60_instructions.h"
 #include "drivers/ethernet/enc28j60_control_registers.h"
+#include "utils/utils.h"
+#include "drivers/display/display_functions.h"
+#include "drivers/fingerprint/fingerprint_main.h"
+
+
+void do_work() {
+
+}
 
 int main() {
-  write_control_register(ECON1, 0x3);
-  write_control_register(MAA)
-  return 0;
+    display_setup();
+    fingerprint_main();
+    display_string(3, "TEST TEST TEST");
+    display_update();
+
+    while (1) {
+        do_work();
+    }
+
+    return 0;
 }
