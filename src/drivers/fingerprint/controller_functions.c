@@ -9,8 +9,10 @@
 
 void handle_sensor_output(int *read_port) {
     // Template - Display sensor output on screen
-    int data = *read_port & 0xFF;
-    display_debug(read_port);
+    //int data = *read_port & 0xFF;
+    //display_debug(read_port);
+    display_string(3, "Interrupt from fingerprint");
+    display_update();
 }
 
 int pack(int pid, int len, int data, int adder) {
