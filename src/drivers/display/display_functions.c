@@ -11,17 +11,17 @@
 /* Declare a helper function which is local to this file */
 static void num32asc( char * s, int ); 
 
-#define DISPLAY_CHANGE_TO_COMMAND_MODE (PORTFCLR = 0x10)
-#define DISPLAY_CHANGE_TO_DATA_MODE (PORTFSET = 0x10)
+#define DISPLAY_CHANGE_TO_COMMAND_MODE (PORTDCLR = 0x400)
+#define DISPLAY_CHANGE_TO_DATA_MODE (PORTDSET = 0x400)
 
 #define DISPLAY_ACTIVATE_RESET (PORTGCLR = 0x200)
 #define DISPLAY_DO_NOT_RESET (PORTGSET = 0x200)
 
-#define DISPLAY_ACTIVATE_VDD (PORTFCLR = 0x40)
-#define DISPLAY_ACTIVATE_VBAT (PORTFCLR = 0x20)
+#define DISPLAY_ACTIVATE_VDD (PORTGCLR = 0x80)
+#define DISPLAY_ACTIVATE_VBAT (PORTDCLR = 0x8)
 
-#define DISPLAY_TURN_OFF_VDD (PORTFSET = 0x40)
-#define DISPLAY_TURN_OFF_VBAT (PORTFSET = 0x20)
+#define DISPLAY_TURN_OFF_VDD (PORTGSET = 0x80)
+#define DISPLAY_TURN_OFF_VBAT (PORTDSET = 0x8)
 
 /* quicksleep:
    A simple function to create a small delay.
@@ -62,7 +62,7 @@ uint8_t spi_send_recv(uint8_t data) {
 }
 
 void display_init(void) {
-        DISPLAY_CHANGE_TO_COMMAND_MODE;
+    DISPLAY_CHANGE_TO_COMMAND_MODE;
 	quicksleep(10);
 	DISPLAY_ACTIVATE_VDD;
 	quicksleep(1000000);
@@ -153,11 +153,12 @@ void display_setup(void) {
 
     /* Output pins for display signals */
     PORTF = 0xFFFF;
-    PORTG = (1 << 9);
+    PORTDSET = 0x408;
+    PORTGSET = 0x280;
     ODCF = 0x0;
     ODCG = 0x0;
-    TRISFCLR = 0x70;
-    TRISGCLR = 0x200;
+    TRISDCLR = 0x408;
+    TRISGCLR = 0x280;
 
     /* Set up input pins */
     TRISDSET = (1 << 8);
