@@ -3,6 +3,7 @@ cmake-build-debug/
 .idea/
 manuals/
 *.c.o
+*.S.o
 *.elf
 *.hex
 .deps/
