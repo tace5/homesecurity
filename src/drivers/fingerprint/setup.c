@@ -21,13 +21,22 @@ void config_uart() {  // Using UART2 on PIN 39 (RX) and PIN 40 (TX)
 }
 
 void handshake() {
+    //TODO - Set package info for handshake command
+    int data[1];
+    *data = 0xABCD1234;
+    int len = 4;
+    int pid = 0x1;
 
+    uint8_t packet[get_total_package_length(len)];
+
+    pack(pid, len, data, 0, packet);
 }
 
 void setup() {
     TRISESET = 0x1;  // Set port connected to Sout to input (PIN 26) and port connected to Vtouch to output (PIN 27)
     config_uart();
     register_interrupts();
+    handshake();
 }
 
 void register_interrupts() {
