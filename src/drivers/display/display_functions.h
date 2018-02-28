@@ -36,7 +36,7 @@ void quicksleep(int cyc);
    repeated calls to display_image; display_image overwrites
    about half of the digits shown by display_debug.
 */
-void display_debug(volatile int *const addr);
+void display_debug(int slot, volatile int *const addr);
 
 void display_setup(void);
 

@@ -45,11 +45,11 @@ void quicksleep(int cyc) {
    repeated calls to display_image; display_image overwrites
    about half of the digits shown by display_debug.
 */
-void display_debug(volatile int *const addr) {
-    display_string(1, "Addr");
-    display_string(2, "Data");
-    num32asc(&textbuffer[1][6], (int) addr);
-    num32asc(&textbuffer[2][6], *addr);
+void display_debug(int slot, volatile int *const addr) {
+    display_string(0 + (slot * 2), "Addr");
+    display_string(1 + (slot * 2), "Data");
+    num32asc(&textbuffer[0 + (slot * 2)][6], (int) addr);
+    num32asc(&textbuffer[1 + (slot * 2)][6], *addr);
     display_update();
 }
 
