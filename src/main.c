@@ -9,19 +9,30 @@
 #include "drivers/fingerprint/controller.h"
 
 
-void do_work() {
-    int test = (IFS(1) & 0x200) >> 9;
-    if(test){
+void user_isr(){
+    if((IFS(1) & 0x200) >> 9){
         handle_interrupt();
+        _delay(1000);
     }
-    display_debug(1, &U2TXREG);
+}
+
+void do_work() {
+    display_string(1, "Turning on LED...");
+    display_update();
+    control_led(1);
+
+    _delay(2000);
+
+    display_string(1, "Turning off LED...");
+    display_update();
+    control_led(0);
 }
 
 int main() {
     display_setup();
+    _enable_interrupt();
+
     fingerprint_main();
-    display_string(3, "TEST TEST TEST");
-    display_update();
 
     while (1) {
         do_work();

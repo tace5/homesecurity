@@ -11,7 +11,7 @@
 void __attribute__ ((interrupt)) handle_interrupt();
 
 void init() {
-    timeout(1000);  // Sleep for 300ms to let sensor startup
+    _delay(1000);  // Sleep for 1s to let sensor startup
 }
 
 void config_uart() {  // Using UART2 on PIN 39 (RX) and PIN 40 (TX)
@@ -21,28 +21,32 @@ void config_uart() {  // Using UART2 on PIN 39 (RX) and PIN 40 (TX)
 }
 
 void handshake() {
-    //TODO - Set package info for handshake command
     int data[1];
-    *data = 0xABCD1234;
-    int len = 4;
+    *data = 0x53;
+    int len = 3;
     int pid = 0x1;
-
-    uint8_t packet[get_total_package_length(len)];
+    int packet_len = get_total_package_length(len);
+    uint8_t packet[packet_len];
 
     pack(pid, len, data, 0, packet);
+
+    transmit_package(packet, packet_len);
+
+    //display_debug(0, &U2RXREG);
 }
 
 void setup() {
     TRISESET = 0x1;  // Set port connected to Sout to input (PIN 26) and port connected to Vtouch to output (PIN 27)
-    config_uart();
     register_interrupts();
+    config_uart();
     handshake();
 }
 
 void register_interrupts() {
-    IECSET(1) = 0x200;  // Enable UART Receiver interrupt
+    IEC(1) |= 0x200;  // Enable UART Receiver interrupt
+    IPC(8) |= 0x1C;  // Set priority
 }
 
 void handle_interrupt() {
-    handle_sensor_output((int *) U2RXREG);
+    handle_sensor_output();
 }
