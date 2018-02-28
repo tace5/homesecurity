@@ -1,6 +1,7 @@
 #include "enc28j60_utils.h"
+#include <stdint.h>
 
-void initialize() {
+void initialize_ethernet(void) {
   uint16_t receive_buffer_start = 0x1000;
   uint16_t receive_buffer_end = 0x1fff;
   uint16_t max_frame_length = 0x5ee;

@@ -1,6 +1,5 @@
 #include <pic32mx.h>
 #include <stdint.h>
-#include "spi1.h"
 
 void spi1_init(void) {
   IECCLR(0) = SPI1RXIF;
@@ -29,7 +28,7 @@ void spi1_transfer(uint8_t data) {
   while (!(SPI1STAT & PIC32_SPISTAT_SPITBE)); // Make sure transmit buffer is empty
 }
 
-void spi1_receive(volatile int* data) {
+void spi1_receive(volatile int * data) {
   while (SPI1STAT & PIC32_SPISTAT_SPITBE); // Wait for transmit buffer to fill up
   *data = SPI1BUF;
 }

@@ -1,10 +1,9 @@
 #include <stdlib.h>
-#include <stdint.h>
 #include "spi1.h"
 #include "enc28j60_control_registers.h"
 
 uint8_t read_control_register(uint8_t eth_register) {
-  uint8_t register_data;
+  int register_data;
   uint8_t op_code = 0x0;
   uint8_t instruction = (op_code << 5) | eth_register;
 
@@ -16,14 +15,16 @@ uint8_t read_control_register(uint8_t eth_register) {
   return register_data;
 }
 
-void read_buffer_memory(volatile int* data, unsigned int length) {
+void read_buffer_memory(volatile int * data, unsigned int length) {
   uint8_t op_code = 0x1;
-  uint8_t instruction = (opcode << 5) | 0x1a;
+  uint8_t instruction = (op_code << 5) | 0x1a;
 
   PORTECLR = SS1;
   spi1_transfer(instruction);
-  for (int i = 0; i < length; i++) {
-    spi1_receive(data + i);
+  int i;
+  for (i = 0; i < length; i++) {
+    spi1_receive(data);
+    data++;
   }
   PORTESET = SS1;
 }
@@ -38,14 +39,16 @@ void write_control_register(uint8_t eth_register, uint8_t data) {
   PORTESET = SS1;
 }
 
-void write_buffer_memory(volatile int* data, unsigned int length) {
+void write_buffer_memory(volatile uint8_t * data, unsigned int length) {
   uint8_t op_code = 0x3;
   uint8_t instruction = (op_code << 5) | 0x1a;
 
   PORTECLR = SS1;
   spi1_transfer(instruction);
-  for(int i = 0; i < length; i++) {
-    spi1_transfer(data + i);
+  int i;
+  for(i = 0; i < length; i++) {
+    spi1_transfer(*data);
+    data++;
   }
   PORTESET = SS1;
 }

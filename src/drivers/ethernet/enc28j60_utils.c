@@ -2,15 +2,15 @@
 #include "enc28j60_instructions.h"
 #include "enc28j60_control_registers.h"
 
-void enable_autoinc() {
+void enable_autoinc(void) {
   bit_field_set(ECON2, AUTOINC);
 }
 
 void set_receive_buffer_pointers(uint16_t receive_buffer_start, uint16_t receive_buffer_end) {
-  uint8_t receive_buffer_start_high = receive_buffer_start & 0xff00;
-  uint8_t receive_buffer_start_low = receive_buffer_start & 0xff;
-  uint8_t receive_buffer_end_high = receive_buffer_end & 0xff00;
-  uint8_t receive_buffer_end_low = receive_buffer_end & 0xff;
+  uint8_t receive_buffer_start_high = (uint8_t) ((receive_buffer_start & 0xff00) >> 8);
+  uint8_t receive_buffer_start_low = (uint8_t) (receive_buffer_start & 0xff);
+  uint8_t receive_buffer_end_high = (uint8_t) ((receive_buffer_end & 0xff00) >> 8);
+  uint8_t receive_buffer_end_low = (uint8_t) (receive_buffer_end & 0xff);
 
   write_control_register(ERXSTH, receive_buffer_start_high);
   write_control_register(ERXSTL, receive_buffer_start_low);
@@ -18,17 +18,18 @@ void set_receive_buffer_pointers(uint16_t receive_buffer_start, uint16_t receive
   write_control_register(ERXNDL, receive_buffer_end_low);
 }
 
-void enable_unicast_filter() {
+void enable_unicast_filter(void) {
   bit_field_set(ERXFCON, (UCEN | ANDOR));
 }
 
-void wait_for_ost() {
+void wait_for_ost(void) {
+  int ostIsReady;
   do {
     ostIsReady = read_control_register(ESTAT) & 0x1;
   } while(!ostIsReady);
 }
 
-void init_mac(uint16_t max_frame_length, uint8_t * mac_address) { // Set MAC control registers in full duplex mode according to the IEEE specification
+void init_mac(uint16_t max_frame_length, volatile uint8_t * mac_address) { // Set MAC control registers in full duplex mode according to the IEEE specification
   select_memory_bank(2);
   uint8_t macon1_bits = MARXEN;
   macon1_bits |= TXPAUS;
@@ -44,8 +45,8 @@ void init_mac(uint16_t max_frame_length, uint8_t * mac_address) { // Set MAC con
 
   bit_field_set(MACON4, DEFER);
 
-  uint8_t max_frame_length_high = max_frame_length & 0xff00;
-  uint8_t max_frame_length_low = max_frame_length & 0xff;
+  uint8_t max_frame_length_high = (uint8_t) ((max_frame_length & 0xff00) >> 8);
+  uint8_t max_frame_length_low = (uint8_t) (max_frame_length & 0xff);
   write_control_register(MAMXFLH, max_frame_length_high);
   write_control_register(MAMXFLL, max_frame_length_low);
   write_control_register(MABBIPG, 0x15);
@@ -71,8 +72,8 @@ void enable_reception() {
   bit_field_set(ECON1, RXEN);
 }
 
-void send_ethernet_frame(uint8_t * dest_mac, uint8_t * source_mac, int length, int * data) { // May needs to be reworked
-  int * protocol;
+void send_ethernet_frame(volatile uint8_t * dest_mac, volatile uint8_t * source_mac, int length, volatile uint8_t * data) { // May needs to be reworked
+  volatile uint8_t * protocol;
   *protocol = 0x4;
 
   write_buffer_memory(dest_mac, 6);
