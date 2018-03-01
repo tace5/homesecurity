@@ -92,6 +92,10 @@ int get_total_package_length(int data_length){
     return (2 + 4 + 1 + 2 + data_length + 2);
 }
 
+uint8_t listen_for_acknowledgement(uint8_t * data_storage){
+    //TODO - Listen for acknowledgement and return confirmation code and put potential data in storage
+}
+
 void transmit_package(uint8_t * package, int package_len){
     int i = 0;
     while (i < package_len){
@@ -100,6 +104,7 @@ void transmit_package(uint8_t * package, int package_len){
         i++;
 
         //DEBUG
+        /*
         volatile unsigned snapshot = (*(volatile unsigned*)(0xA0003000 + (0xF44)));
         snapshot = package[i];
         char debug[16] = "T P nr ";
@@ -110,11 +115,11 @@ void transmit_package(uint8_t * package, int package_len){
         //display_string(1, value);
         display_update();
         display_debug(1, &snapshot);
-        _delay(500);
+        _delay(500);*/
     }
 }
 
-void pack(int pid, int data_length, int * data, int adder, uint8_t * storage) {
+void pack(uint8_t pid, int data_length, uint8_t * data, int adder, uint8_t * storage) {
     int len = data_length + 2; // Add 2 bytes to len count for checksum
     int package_len = (2 + 4 + 1 + 2 + len);  // Calculate the total package length (HEADER + ADDER + PID + LENGTH + DATA(len + SUM)) bytes
 
@@ -132,7 +137,7 @@ void pack(int pid, int data_length, int * data, int adder, uint8_t * storage) {
     storage[5] = (adder & 0xFF);
 
     //Set Package ID
-    storage[6] = pid & 0xFF;
+    storage[6] = pid;
 
     //Set Package Length
     storage[7] = (len & 0xFF00) >> (1 * 8);
@@ -140,9 +145,8 @@ void pack(int pid, int data_length, int * data, int adder, uint8_t * storage) {
 
     //Set Package Data
     int i;
-    char * data_byte = (char *) data;
-    for (i = 0; i < len - 2; ++i) {
-        storage[9 + i] = (*(data_byte + ((len - 3) - i)) & 0xFF);
+    for (i = 0; i < data_length; ++i) {
+        storage[9 + i] = data[i];
     }
 
     //Set Package Checksum
@@ -164,7 +168,7 @@ void control_led(int on){
         *data = 0x51;
     }
     int len = 3;
-    int pid = 0x1;
+    uint8_t pid = 0x1;
     int packet_len = get_total_package_length(len);
     uint8_t packet[packet_len];
 

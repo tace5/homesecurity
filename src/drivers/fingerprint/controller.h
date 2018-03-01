@@ -18,10 +18,17 @@
 extern char serial_buffer[10][9];
 
 void handle_sensor_output();
+
 int check_for_errors();
+
 int get_total_package_length(int data_length);
-void transmit_package(uint8_t * package, int package_len);
-void pack(int pid, int data_length, int * data, int adder, uint8_t * storage);
+
+uint8_t listen_for_acknowledgement(uint8_t *data_storage);
+
+void transmit_package(uint8_t *package, int package_len);
+
+void pack(uint8_t pid, int data_length, uint8_t *data, int adder, uint8_t *storage);
+
 int unpack(int package);
 
 #include "controller_functions.c"
