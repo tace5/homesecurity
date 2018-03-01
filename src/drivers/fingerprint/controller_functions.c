@@ -159,20 +159,3 @@ int unpack(int package) {
     //TODO - Logic for unpacking the package contents depending on package type
     return 0;
 }
-
-void control_led(int on){
-    int data[1];
-    if(on){
-        *data = 0x50;
-    } else{
-        *data = 0x51;
-    }
-    int len = 3;
-    uint8_t pid = 0x1;
-    int packet_len = get_total_package_length(len);
-    uint8_t packet[packet_len];
-
-    pack(pid, len, data, 0, packet);
-
-    transmit_package(packet, packet_len);
-}

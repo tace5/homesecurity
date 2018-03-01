@@ -7,6 +7,7 @@
 #include "setup.h"
 #include "../../utils/utils.h"
 #include "controller.h"
+#include "commands.h"
 
 void __attribute__ ((interrupt)) handle_interrupt();
 
@@ -20,26 +21,11 @@ void config_uart() {  // Using UART2 on PIN 39 (RX) and PIN 40 (TX)
     U2MODESET = 0x80A0;  // MODE bits : 1000 0000 1010 0000
 }
 
-void handshake() {
-    int data[1];
-    *data = 0x53;
-    int len = 3;
-    int pid = 0x1;
-    int packet_len = get_total_package_length(len);
-    uint8_t packet[packet_len];
-
-    pack(pid, len, data, 0, packet);
-
-    transmit_package(packet, packet_len);
-
-    //display_debug(0, &U2RXREG);
-}
-
 void setup() {
     TRISESET = 0x1;  // Set port connected to Sout to input (PIN 26) and port connected to Vtouch to output (PIN 27)
     register_interrupts();
     config_uart();
-    handshake();
+    force_handshake();
 }
 
 void register_interrupts() {
