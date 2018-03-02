@@ -7,25 +7,23 @@
 #include "drivers/display/display_functions.h"
 #include "drivers/fingerprint/fingerprint_main.h"
 #include "drivers/fingerprint/controller.h"
+#include "drivers/fingerprint/commands.h"
 
 
 void user_isr(){
-    if((IFS(1) & 0x200) >> 9){
-        handle_interrupt();
-        _delay(1000);
-    }
+    // Check for interrupts here
 }
 
 void do_work() {
     display_string(1, "Turning on LED...");
     display_update();
-    control_led(1);
+    change_led(1);
 
     _delay(2000);
 
     display_string(1, "Turning off LED...");
     display_update();
-    control_led(0);
+    change_led(0);
 }
 
 int main() {

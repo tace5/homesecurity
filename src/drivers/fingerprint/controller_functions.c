@@ -9,62 +9,6 @@
 #include "../display/display_functions.h"
 #include "../../utils/utils.h"
 
-void handle_sensor_output() {
-    display_string(0, "Handling data");
-    display_update();
-
-    IFSCLR(1) = 0x200;
-
-    if(U2STA & 0x10){
-        display_string(1, "No data received");
-        display_update();
-
-        return;
-    }
-
-    int i = 0;
-    uint8_t padding_data[9];  // Storage for the first 9 bytes before package data is transmitted
-    while (i < 9){
-        while (!(U2STA & 0xF));  // Wait for Buffer Data available or Errors
-        if(!check_for_errors()){
-            padding_data[i] = U2RXREG;
-            i++;
-        }
-        else{
-            break;  // TODO - Handle failure
-        }
-    }
-
-    //Calculate how big the storage for the received data + checksum has to be.
-    int data_length = (padding_data[7] << 8) | padding_data[8];
-    uint8_t package_data[data_length];
-    i = 0;
-    while(i < data_length){
-        while (!(U2STA & 0xF));  // Wait for Buffer Data available or Errors
-        if(!check_for_errors()){
-            package_data[i] = U2RXREG;
-            i++;
-        }
-        else{
-            break;  // TODO - Handle failure
-        }
-    }
-
-    //TODO - Handle sending back a acknowledgement packet
-
-
-    // Template - print out info on screen
-    display_string(0, "DATA RECEIVED:");
-    i = 0;
-    while(i < data_length){
-        char value[8];
-        num32asc(value, (int) package_data[i]);
-        display_string(1, value);
-        display_update();
-        _delay(1500);
-        i++;
-    }
-}
 
 int check_for_errors(){
     if(U2STA & 0x8){

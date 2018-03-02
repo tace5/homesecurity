@@ -29,10 +29,5 @@ void setup() {
 }
 
 void register_interrupts() {
-    IEC(1) |= 0x200;  // Enable UART Receiver interrupt
-    IPC(8) |= 0x1C;  // Set priority
-}
-
-void handle_interrupt() {
-    handle_sensor_output();
+    // TODO - Register interrupt for touch trigger
 }
