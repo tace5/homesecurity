@@ -11,7 +11,9 @@
 
 
 void user_isr(){
-    // Check for interrupts here
+    if((IFS(0) & FINGER_TOUCH_INT) >> 11){
+        handle_interrupt();
+    }
 }
 
 void do_work() {

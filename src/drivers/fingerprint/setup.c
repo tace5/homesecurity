@@ -30,4 +30,6 @@ void setup() {
 
 void register_interrupts() {
     // TODO - Register interrupt for touch trigger
+    IECSET(0) = FINGER_TOUCH_INT;      // Enable INT2 interrupt
+    IPCSET(2) = 0x1B000000; // Set priority = 6 and sub = 3
 }

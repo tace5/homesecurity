@@ -8,11 +8,7 @@
 #define HEADER 0xEF01  // Header value for data package
 #define ADDR 0xFFFFFFFF  // Default adder value for data package
 
-//  Package identifier codes
-#define PACKAGE_COMMAND 0x1
-#define PACKAGE_DATA 0x2
-#define PACKAGE_ACKNOWLEDGEMENT 0x7
-#define PACKAGE_END 0x8
+#define FINGER_TOUCH_INT 0x800
 
 /* Declare serial buffer for storing output from sensor */
 extern char serial_buffer[10][9];
@@ -20,6 +16,8 @@ extern char serial_buffer[10][9];
 int check_for_errors();
 
 int get_total_package_length(int data_length);
+
+void handle_interrupt();
 
 uint8_t listen_for_acknowledgement(uint8_t *data_storage);
 

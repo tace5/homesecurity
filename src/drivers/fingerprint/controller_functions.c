@@ -42,8 +42,21 @@ int get_total_package_length(int data_length){
     return (2 + 4 + 1 + 2 + data_length + 2);
 }
 
+void handle_interrupt(){
+    IFSCLR(0) = FINGER_TOUCH_INT;
+
+    // TODO - Check for user settings and act accordingly
+
+    // Is alarm active
+
+    // Is the user trying to add a new print
+
+    // Is the user activating the alarm
+
+
+}
+
 uint8_t listen_for_acknowledgement(uint8_t * data_storage){
-    //TODO - Listen for acknowledgement and return confirmation code and put potential data in storage
 
     int i = 0;
     uint8_t padding_data[9];  // Storage for the first 9 bytes before package data is transmitted
@@ -114,12 +127,12 @@ void pack(uint8_t pid, int data_length, uint8_t * data, int adder, uint8_t * sto
     int package_len = (2 + 4 + 1 + 2 + len);  // Calculate the total package length (HEADER + ADDER + PID + LENGTH + DATA(len + SUM)) bytes
 
     //Set HEADER
-    storage[0] = (0xEF01 & 0xFF00) >> 8;
-    storage[1] = 0xEF01 & 0xFF;
+    storage[0] = (HEADER & 0xFF00) >> 8;
+    storage[1] = HEADER & 0xFF;
 
     //Set ADDR
     if(adder == 0){
-        adder = 0xFFFFFFFF;
+        adder = ADDR;
     }
     storage[2] = (adder & 0xFF000000) >> (8 * 3);
     storage[3] = (adder & 0xFF0000) >> (8 * 2);
