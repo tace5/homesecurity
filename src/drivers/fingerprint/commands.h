@@ -88,13 +88,13 @@ uint8_t drop_prints_in_flash(void);
 
 uint8_t set_sys_param(uint8_t param, uint8_t value);
 
-int * get_sys_params(void);
+uint8_t * get_sys_params(void);
 
 uint8_t set_address(int adr);
 
 uint8_t write_to_notepad(uint8_t page, uint8_t * content);
 
-int * read_notepad_page(uint8_t page);
+uint8_t * read_notepad_page(uint8_t page);
 
 uint8_t change_led(uint8_t on);
 

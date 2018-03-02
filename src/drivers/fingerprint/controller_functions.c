@@ -75,13 +75,14 @@ uint8_t listen_for_acknowledgement(uint8_t * data_storage){
 
     // Read additional data if any, skip checksum at the end of the package
     if(data_length > 0x3){
-        for (int j = 1; j < data_length - 2; ++j) {
+        int j = 1;
+        for (j; j < data_length - 2; ++j) {
             data_storage[j - 1] = package_data[j];
         }
     }
 
     // Return the confirmation code
-    return package_data[0];
+    return *package_data;
 
 }
 

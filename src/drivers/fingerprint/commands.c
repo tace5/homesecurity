@@ -21,7 +21,8 @@ uint8_t scan_print(void) {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     return response;
 }
@@ -44,7 +45,8 @@ uint8_t image_to_buffer(uint8_t buffer_id) {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     return response;
 }
@@ -98,7 +100,8 @@ uint8_t generate_print_model(void) {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     return response;
 }
@@ -123,7 +126,8 @@ uint8_t save_print_to_flash(uint8_t buffer_id) {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     return response;
 }
@@ -148,7 +152,8 @@ uint8_t load_print_from_flash(uint8_t buffer_id) {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     return response;
 }
@@ -170,7 +175,8 @@ uint8_t delete_print_in_flash(int page_id) {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     return response;
 }
@@ -188,7 +194,8 @@ uint8_t drop_prints_in_flash(void) {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     return response;
 }
@@ -208,7 +215,8 @@ uint8_t set_sys_param(uint8_t param, uint8_t value) {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     return response;
 }
@@ -224,7 +232,7 @@ uint8_t *get_sys_params(void) {
 
     pack(pid, len, data, MODULE_ADDRESS, packet);
 
-    uint8_t storage[17];
+    uint8_t static storage[17];
 
     transmit_package(packet, packet_len);
     storage[0] = listen_for_acknowledgement(storage + 1);
@@ -249,7 +257,8 @@ uint8_t set_address(int adr) {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     return response;
 }
@@ -260,7 +269,9 @@ uint8_t write_to_notepad(uint8_t page, uint8_t *content) {
     uint8_t data[34];
     data[0] = IC_WRITE_NOTEPAD;
     data[1] = page;
-    for (int i = 0; i < 32; ++i) {
+
+    int i = 0;
+    for (i; i < 32; ++i) {
         data[2 + i] = content[i];
     }
     int len = sizeof(data) / 8;  // Data length in bytes, excluding length of PID and checksum
@@ -271,7 +282,8 @@ uint8_t write_to_notepad(uint8_t page, uint8_t *content) {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t static * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     return response;
 }
@@ -288,7 +300,7 @@ uint8_t *read_notepad_page(uint8_t page) {
 
     pack(pid, len, data, MODULE_ADDRESS, packet);
 
-    uint8_t response[33];
+    uint8_t static response[33];
 
     transmit_package(packet, packet_len);
     response[0] = listen_for_acknowledgement(response + 1);
@@ -313,7 +325,8 @@ uint8_t change_led(uint8_t on) {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     return response;
 }
@@ -331,7 +344,8 @@ uint8_t force_handshake() {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     return response;
 }
@@ -354,7 +368,8 @@ uint8_t run_auto_login(void) {
 
     transmit_package(packet, packet_len);
 
-    uint8_t response = listen_for_acknowledgement();
+    uint8_t * storage;
+    uint8_t response = listen_for_acknowledgement(storage);
 
     //TODO - Handle PS_AUTOLOGIN_OK1 and 2
 
@@ -377,7 +392,7 @@ uint8_t run_auto_search(uint8_t * match_score) {
 
     pack(pid, len, data, MODULE_ADDRESS, packet);
 
-    uint8_t * storage[4];
+    uint8_t static storage[4];
 
     transmit_package(packet, packet_len);
     uint8_t response = listen_for_acknowledgement(storage);
