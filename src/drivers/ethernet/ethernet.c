@@ -10,7 +10,6 @@ void initialize_ethernet(void) {
   enable_autoinc();
   set_receive_buffer_pointers(receive_buffer_start, receive_buffer_end);
   enable_unicast_filter();
-  wait_for_ost();
   init_mac(max_frame_length, mac_address);
   enable_reception();
 }

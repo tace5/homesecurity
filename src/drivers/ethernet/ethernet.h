@@ -1,5 +1,6 @@
 
 #ifndef HOMESECURITY_ETHERNET_H
+#define HOMESECURITY_ETHERNET_H
 
 void initialize_ethernet(void);
 

@@ -1,5 +1,6 @@
 
 #ifndef HOMESECURITY_SPI1_H
+#define HOMESECURITY_SPI1_H
 
 #include <stdint.h>
 
@@ -9,8 +10,9 @@
 #define SPI1EIF 0x800000
 
 void spi1_init(void);
-void spi1_transfer(uint8_t data);
-void spi1_receive(volatile int * data);
+void spi_transfer(const void * buf, void * retbuf, uint32_t count);
+uint8_t spi1_transfer(uint16_t data);
+uint8_t spi1_receive();
 
 #include "spi1.c"
 
