@@ -36,7 +36,7 @@ void handle_sensor_output() {
     }
 
     //Calculate how big the storage for the received data + checksum has to be.
-    int data_length = (padding_data[7] << 8) & padding_data[8];
+    int data_length = (padding_data[7] << 8) | padding_data[8];
     uint8_t package_data[data_length];
     i = 0;
     while(i < data_length){
@@ -71,18 +71,24 @@ int check_for_errors(){
         display_string(1, "ERROR! Parity");
         display_update();
         _delay(1000);
+
+        return 1;
     }
 
     if(U2STA & 0x4){
         display_string(1, "ERROR! Framing");
         display_update();
         _delay(1000);
+
+        return 1;
     }
 
     if(U2STA & 0x2){
         display_string(1, "ERROR! Overflow");
         display_update();
         _delay(1000);
+
+        return 1;
     }
 
     return 0;
@@ -94,6 +100,45 @@ int get_total_package_length(int data_length){
 
 uint8_t listen_for_acknowledgement(uint8_t * data_storage){
     //TODO - Listen for acknowledgement and return confirmation code and put potential data in storage
+
+    int i = 0;
+    uint8_t padding_data[9];  // Storage for the first 9 bytes before package data is transmitted
+    while (i < 9){
+        while (!(U2STA & 0xF));  // Wait for Buffer Data available or Errors
+        if(!check_for_errors()){
+            padding_data[i] = U2RXREG;
+            i++;
+        }
+        else{
+            break;  // TODO - Handle failure
+        }
+    }
+
+    //Calculate how big the storage for the received confirmation code + data + checksum has to be.
+    int data_length = (padding_data[7] << 8) | padding_data[8];
+    uint8_t package_data[data_length];
+    i = 0;
+    while(i < data_length){
+        while (!(U2STA & 0xF));  // Wait for Buffer Data available or Errors
+        if(!check_for_errors()){
+            package_data[i] = U2RXREG;
+            i++;
+        }
+        else{
+            break;  // TODO - Handle failure
+        }
+    }
+
+    // Read additional data if any, skip checksum at the end of the package
+    if(data_length > 0x3){
+        for (int j = 1; j < data_length - 2; ++j) {
+            data_storage[j - 1] = package_data[j];
+        }
+    }
+
+    // Return the confirmation code
+    return package_data[0];
+
 }
 
 void transmit_package(uint8_t * package, int package_len){
