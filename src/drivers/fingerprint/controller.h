@@ -17,8 +17,6 @@
 /* Declare serial buffer for storing output from sensor */
 extern char serial_buffer[10][9];
 
-void handle_sensor_output();
-
 int check_for_errors();
 
 int get_total_package_length(int data_length);

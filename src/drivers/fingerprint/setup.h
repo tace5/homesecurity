@@ -11,11 +11,7 @@ void config_uart(void);
 
 void setup(void);
 
-void handshake(void);
-
 void register_interrupts(void);
-
-void handle_interrupt(void);
 
 #include "setup.c"
 
