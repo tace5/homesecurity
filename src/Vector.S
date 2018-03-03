@@ -127,19 +127,21 @@ _enable_interrupt:
 
 .global _delay
 _delay:
-  PUSH $a0
-  ble $a0, $zero, delay_return
-  nop
-  loop_outer:
-    addi $t0, $zero, 7000 
-    loop_inner:
-      addi $t0, $t0, -1
-      bne $t0, 0, loop_inner
-      nop
-    addi $a0, $a0, -1
-    bne $a0, 0, loop_outer
+    PUSH $a0
+    addi $t0, $0, 5250	# Initialize constant
+    add $t1, $0, $0		# Initialize i
+    while:
+        add $t1, $0, $0		# Reset i
+        for:
+            addi $t1, $t1, 1	# i + 1
+            bne $t1, $t0, for	# i < const
+            nop
+
+        li $t2, 1
+        sub $a0, $a0, $t2	# ms - 1
+        slti $t3, $a0, 1	# if(ms > 0)
+        bne $t3, 1, while	#   continue while
+        nop
+    POP $a0
+    jr $ra
     nop
-  delay_return:
-  POP $a0
-  jr $ra
-  nop
