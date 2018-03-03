@@ -8,24 +8,29 @@
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 
 
+void buzzer_init(){
+    TRISDCLR = BUZZER_BIT;
+    PORTDSET = BUZZER_BIT;
+}
+
 void buzz(int duration) {
     int i = 0;
     uint8_t freq_break = 0;
     uint8_t freq = 0;
 
     while (i < (duration << 1)){
-        if(freq_break == 0x32){
-            freq = ~(freq | 0x1);
+        if(freq_break == 0x8){
+            freq = ~(freq | 0x0);
             freq_break = 0;
         }
 
-        BUZZER_PORT_SET = BUZZER_BIT;
+        PORTDCLR = BUZZER_BIT;
         if(freq){
-            _delay(2);
+            _delay(100);
         } else{
-            _delay(1);
+            _delay(50);
         }
-        BUZZER_PORT_CLR = BUZZER_BIT;
+        PORTDSET = BUZZER_BIT;
 
         freq_break++;
         i++;
@@ -33,7 +38,5 @@ void buzz(int duration) {
             i++;
         }
     }
-
-    return 1;
 }
 

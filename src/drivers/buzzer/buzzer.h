@@ -5,9 +5,9 @@
 #ifndef HOMESECURITY_BUZZER_H
 #define HOMESECURITY_BUZZER_H
 
-#define BUZZER_PORT_SET     PORTESET
-#define BUZZER_PORT_CLR     PORTECLR
-#define BUZZER_BIT          0x20
+#define BUZZER_BIT          0x1
+
+void buzzer_init(void);
 
 void buzz(int duration);
 
