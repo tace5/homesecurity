@@ -8,7 +8,10 @@
 #include "controller.h"
 #include "../display/display_functions.h"
 #include "../../utils/utils.h"
+#include "../../state.h"
 
+
+void __attribute__ ((interrupt)) handle_interrupt();
 
 int check_for_errors(){
     if(U2STA & 0x8){
@@ -44,14 +47,51 @@ int get_total_package_length(int data_length){
 
 void handle_interrupt(){
     IFSCLR(0) = FINGER_TOUCH_INT;
+    uint8_t state = CURRENT_STATE;
+    if(CURRENT_STATE != FINGER_OFF_INT){
+        CURRENT_STATE = FINGER_OFF_INT;
+    }
+
+    display_string(0, "Finger touched!");
+    display_update();
+
+    _delay(1000);
 
     // TODO - Check for user settings and act accordingly
 
-    // Is alarm active
+    switch(state) {
+        // Case: State = Default
+        case DEFAULT_STATE:
+            display_string(1, "State is default");
+            display_update();
+            break;
 
-    // Is the user trying to add a new print
+        // Case: State = Config mode
+        case CONFIG_MODE:
+            display_string(1, "State is conifg");
+            display_update();
+            state = DEFAULT_STATE;
+            break;
 
-    // Is the user activating the alarm
+        // Case: State = Alarm is armed but not triggered
+        case ALARM_ARMED:
+            display_string(1, "State is alarm is armed");
+            display_update();
+            break;
+
+        // Case: State = Alarm is triggered
+        case ALARM_TRIGGERED:
+            display_string(1, "State is alarm blaring");
+            display_update();
+            break;
+
+        // Case: State = Finger is leaving sensor
+        case FINGER_OFF_INT:
+            CURRENT_STATE = DEFAULT_STATE;
+            display_string(1, "State is finger off");
+            display_update();
+            break;
+    }
 
 
 }
