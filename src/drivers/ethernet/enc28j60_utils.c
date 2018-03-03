@@ -62,7 +62,7 @@ void init_mac(uint16_t max_frame_length, volatile uint8_t * mac_address) { // Se
 void select_memory_bank(uint8_t bank) {
   if (bank >= 0 && bank <= 3) {
     CURRENT_BANK = bank;
-    bit_field_clr(ECON1, 0x3);
+    bit_field_clr(ECON1, BSEL);
     bit_field_set(ECON1, bank);
   }
 }
@@ -79,24 +79,21 @@ void enable_reception() {
 }
 
 void send_ethernet_frame(volatile uint8_t * dest_mac, volatile uint8_t * source_mac, int length, volatile uint8_t * data) { // May needs to be reworked
-  uint8_t protocol = 0x4;
+  uint8_t protocol[2] = {0x08, 0x00};
 
   write_buffer_memory(dest_mac, 6);
   write_buffer_memory(source_mac, 6);
-  write_buffer_memory(&protocol, 2);
-  write_buffer_memory(data, length);
+  write_buffer_memory(protocol, 2);
+
+  //write_buffer_memory()
 
   if (length <= 46) {
     write_control_register(ETXNDL, 64);
   } else if (length > 46) {
     uint16_t end_pointer = 18 + length;
     write_control_register(ETXNDL, (end_pointer & 0xff));
-    write_control_register(ETXNDH, (end_pointer & 0x1f));
+    write_control_register(ETXNDH, ((end_pointer & 0x1f00) >> 8));
   }
-
-  int ma_data = read_control_register(EIE);
-
-  display_debug(1, &ma_data);
 
   bit_field_clr(EIR, TXIF);
   bit_field_set(EIE, (TXIE | INTIE));
