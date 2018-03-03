@@ -9,7 +9,6 @@
 #include "drivers/fingerprint/controller.h"
 #include "drivers/fingerprint/commands.h"
 
-
 void user_isr(){
     if((IFS(0) & FINGER_TOUCH_INT) >> 11){
         handle_interrupt();
@@ -34,9 +33,5 @@ int main() {
 
     fingerprint_main();
 
-    while (1) {
-        do_work();
-    }
-
-    return 0;
+  return 0;
 }
