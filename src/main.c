@@ -4,10 +4,12 @@
 //#include "drivers/ethernet/enc28j60_instructions.h"
 //#include "drivers/ethernet/enc28j60_control_registers.h"
 #include "utils/utils.h"
+#include "state.h"
 #include "drivers/display/display_functions.h"
 #include "drivers/fingerprint/fingerprint_main.h"
 #include "drivers/fingerprint/controller.h"
 #include "drivers/fingerprint/commands.h"
+#include "drivers/buzzer/buzzer.h"
 
 
 void user_isr(){
@@ -17,19 +19,17 @@ void user_isr(){
 }
 
 void do_work() {
-    display_string(1, "Turning on LED...");
+    display_string(0, "Buzzing...");
     display_update();
-    change_led(1);
-
+    buzz(50);
+    display_string(0, "Buzzing stopped");
+    display_update();
     _delay(2000);
-
-    display_string(1, "Turning off LED...");
-    display_update();
-    change_led(0);
 }
 
 int main() {
     display_setup();
+    buzzer_init();
     _enable_interrupt();
 
     fingerprint_main();
