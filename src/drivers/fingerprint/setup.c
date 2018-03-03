@@ -7,11 +7,12 @@
 #include "setup.h"
 #include "../../utils/utils.h"
 #include "controller.h"
+#include "commands.h"
 
 void __attribute__ ((interrupt)) handle_interrupt();
 
 void init() {
-    timeout(1000);  // Sleep for 300ms to let sensor startup
+    _delay(1000);  // Sleep for 1s to let sensor startup
 }
 
 void config_uart() {  // Using UART2 on PIN 39 (RX) and PIN 40 (TX)
@@ -20,20 +21,15 @@ void config_uart() {  // Using UART2 on PIN 39 (RX) and PIN 40 (TX)
     U2MODESET = 0x80A0;  // MODE bits : 1000 0000 1010 0000
 }
 
-void handshake() {
-
-}
-
 void setup() {
     TRISESET = 0x1;  // Set port connected to Sout to input (PIN 26) and port connected to Vtouch to output (PIN 27)
-    config_uart();
     register_interrupts();
+    config_uart();
+    force_handshake();
 }
 
 void register_interrupts() {
-    IECSET(1) = 0x200;  // Enable UART Receiver interrupt
-}
-
-void handle_interrupt() {
-    handle_sensor_output((int *) U2RXREG);
+    // TODO - Register interrupt for touch trigger
+    IECSET(0) = FINGER_TOUCH_INT;      // Enable INT2 interrupt
+    IPCSET(2) = 0x1B000000; // Set priority = 6 and sub = 3
 }

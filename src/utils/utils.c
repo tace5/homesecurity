@@ -2,21 +2,29 @@
 // Created by Linus on 2018-02-26.
 //
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-//#include <unistd.h> TODO - figure out why #ifdef doesn't work
-#endif
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "utils.h"
 
-void timeout(int ms){
-#ifdef _WIN32
-    Sleep(ms);
-#else
-    //usleep(ms*1000);  /* sleep for 100 milliSeconds */ TODO
-#endif
+
+char* itoa(int i, char b[]){
+    char const digit[] = "0123456789";
+    char* p = b;
+    if(i<0){
+        *p++ = '-';
+        i *= -1;
+    }
+    int shifter = i;
+    do{ //Move to where representation ends
+        ++p;
+        shifter = shifter/10;
+    }while(shifter);
+    *p = '\0';
+    do{ //Move back, inserting digits as u go
+        *--p = digit[i%10];
+        i = i/10;
+    }while(i);
+    return b;
 }
 
 // /**

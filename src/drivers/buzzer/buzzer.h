@@ -5,8 +5,12 @@
 #ifndef HOMESECURITY_BUZZER_H
 #define HOMESECURITY_BUZZER_H
 
-//void buzz(int duration); TODO
+#define BUZZER_BIT          0x1
 
-//#include "buzzer.c"
+void buzzer_init(void);
+
+void buzz(int duration);
+
+#include "buzzer.c"
 
 #endif //HOMESECURITY_BUZZER_H

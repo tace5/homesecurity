@@ -5,9 +5,13 @@
 #ifndef HOMESECURITY_UTILS_H
 #define HOMESECURITY_UTILS_H
 
-void timeout(int ms);
+char* itoa(int i, char b[]);
 
 int gen_UxBRG(int processor_freq, int baud_rate);
+
+extern void _enable_interrupt();
+
+extern void _delay();
 
 #include "utils.c"
 
