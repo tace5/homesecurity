@@ -1,4 +1,7 @@
 
+#ifndef HOMESECURITY_ENC28J60_CONTROL_REGISTERS_H
+#define HOMESECURITY_ENC28J60_CONTROL_REGISTERS_H
+
 // Common registers
 #define EIE       0x1b
 #define EIR       0x1c
@@ -97,66 +100,68 @@
 */
 
 // EIE
-#define INTIE   0x80;
-#define PKTIE   0x40;
-#define DMAIE   0x20;
-#define LINKIE  0x10;
-#define TXIE    0x8;
-#define TXERIE  0x2;
-#define RXERIE  0x1;
+#define INTIE   0x80
+#define PKTIE   0x40
+#define DMAIE   0x20
+#define LINKIE  0x10
+#define TXIE    0x8
+#define TXERIE  0x2
+#define RXERIE  0x1
 
 // EIR
-#define PKTIF   0x40;
-#define DMAIF   0x20;
-#define LINKIF  0x10;
-#define TXIF    0x80;
-#define TXERIF  0x20;
-#define RXERIF  0x10;
+#define PKTIF   0x40
+#define DMAIF   0x20
+#define LINKIF  0x10
+#define TXIF    0x80
+#define TXERIF  0x20
+#define RXERIF  0x10
 
 // ESTAT
-#define INT     0x80;
-#define BUFER   0x40;
-#define LATECOL 0x10;
-#define RXBUSY  0x4;
-#define TXABRT  0x2;
-#define CLKRDY  0x1;
+#define INT     0x80
+#define BUFER   0x40
+#define LATECOL 0x10
+#define RXBUSY  0x4
+#define TXABRT  0x2
+#define CLKRDY  0x1
 
 // ECON2
-#define AUTOINC 0x80;
-#define PKTDEC  0x40;
-#define PWRSV   0x20;
-#define VRPS    0x8;
+#define AUTOINC 0x80
+#define PKTDEC  0x40
+#define PWRSV   0x20
+#define VRPS    0x8
 
 // ECON1
-#define TXRST   0x80;
-#define RXRST   0x40;
-#define DMAST   0x20;
-#define CSUMEN  0x10;
-#define TXRTS   0x8;
-#define RXEN    0x4;
-#define BSEL    0x3;
+#define TXRST   0x80
+#define RXRST   0x40
+#define DMAST   0x20
+#define CSUMEN  0x10
+#define TXRTS   0x8
+#define RXEN    0x4
+#define BSEL    0x3
 
 // ERXFCON
-#define UCEN    0x80;
-#define ANDOR   0x40;
+#define UCEN    0x80
+#define ANDOR   0x40
 
 // MACON1
-#define TXPAUS  0x8;
-#define RXPAUS  0x4;
-#define PASSALL 0x2;
-#define MARXEN  0x1;
+#define TXPAUS  0x8
+#define RXPAUS  0x4
+#define PASSALL 0x2
+#define MARXEN  0x1
 
 // MACON3
-#define PADCFG2 0x80;
-#define PADCFG1 0x40;
-#define PADCFG0 0x20;
-#define TXCRCEN 0x10;
-#define PHDREN  0x8;
-#define HFRMEN  0x4;
-#define FRMLNEN 0x2;
-#define FULDPX  0x1;
+#define PADCFG2 0x80
+#define PADCFG1 0x40
+#define PADCFG0 0x20
+#define TXCRCEN 0x10
+#define PHDREN  0x8
+#define HFRMEN  0x4
+#define FRMLNEN 0x2
+#define FULDPX  0x1
 
 // MACON4
-#define DEFER   0x40;
-#define BPEN    0x20;
-#define NOPKOFF 0x10;
+#define DEFER   0x40
+#define BPEN    0x20
+#define NOPKOFF 0x10
+
+#endif //HOMESECURITY_ENC28J60_CONTROL_REGISTERS_H
