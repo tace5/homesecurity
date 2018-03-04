@@ -7,6 +7,8 @@
 
 char* itoa(int i, char b[]);
 
+int digits(int n);
+
 int gen_UxBRG(int processor_freq, int baud_rate);
 
 extern void _enable_interrupt();

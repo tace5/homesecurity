@@ -27,6 +27,12 @@ char* itoa(int i, char b[]){
     return b;
 }
 
+int digits (int n) {
+    if (n < 0) return digits ((n == INT_MIN) ? INT_MAX: -n);
+    if (n < 10) return 1;
+    return 1 + digits (n / 10);
+}
+
 // /**
 // * Generate the UxBRG value for the peripheral bus
 // * from the current processor frequency and the desired baud rate.
