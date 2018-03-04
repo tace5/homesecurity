@@ -13,6 +13,8 @@
 /* Declare serial buffer for storing output from sensor */
 extern char serial_buffer[10][9];
 
+// CORE FUNCTIONS
+
 int check_for_errors();
 
 int get_total_package_length(int data_length);
@@ -27,6 +29,21 @@ void pack(uint8_t pid, int data_length, uint8_t *data, int adder, uint8_t *stora
 
 int unpack(int package);
 
+// CONTROLLER FUNCTIONS
+
+void enroll_print_1st();
+
+void enroll_print_2nd();
+
+uint8_t auth_chain(uint8_t * match_score);
+
+void authenticate();
+
+void arm_alarm();
+
+void disarm();
+
+#include "controller_core.c"
 #include "controller_functions.c"
 
 #endif //HOMESECURITY_CONTROLLER_H

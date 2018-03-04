@@ -9,16 +9,15 @@
 #include "controller.h"
 #include "commands.h"
 
-void __attribute__ ((interrupt)) handle_interrupt();
-
 void init() {
     _delay(1000);  // Sleep for 1s to let sensor startup
 }
 
 void config_uart() {  // Using UART2 on PIN 39 (RX) and PIN 40 (TX)
-    U2BRGSET = gen_UxBRG(80000000, 57600);
-    U2STASET = 0x1480;  // Status and Control bits : 0001 0100 1000 0000
-    U2MODESET = 0x80A0;  // MODE bits : 1000 0000 1010 0000
+    U2BRG = gen_UxBRG(80000000, 57600);
+    U2STA = 0;
+    U2MODESET = 0x8000;  // MODE bits : 1000 0000 0000 0000
+    U2STASET = 0x1400;  // Status and Control bits : 0001 0100 0000 0000
 }
 
 void setup() {
@@ -29,7 +28,7 @@ void setup() {
 }
 
 void register_interrupts() {
-    // TODO - Register interrupt for touch trigger
+    INTCONSET = 0x4;
     IECSET(0) = FINGER_TOUCH_INT;      // Enable INT2 interrupt
     IPCSET(2) = 0x1B000000; // Set priority = 6 and sub = 3
 }
