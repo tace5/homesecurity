@@ -12,85 +12,140 @@
 #include "../../state.h"
 
 
-void enroll_print_1st(){
+char scan_finger(uint8_t buffer_id){
+    char success = 0x1;
+
     display_string(1, "Keep finger");
     display_string(2, "on sensor!");
     display_update();
 
     uint8_t res_led = change_led(1);
-    uint8_t res_scan = scan_print();
-    uint8_t res_to_buffer = image_to_buffer(CHAR_BUFFER_1);
+
+    if(res_led == RES_RECEIVE_FAIL){
+        success = 0x0;
+    }
+
+    if(success == 0x1) {
+        uint8_t res_to_buffer;
+        do {
+            uint8_t res_scan;
+            do {
+                res_scan = scan_print();
+
+                if (res_scan == RES_NO_FINGER) {
+                    display_string(1, "No finger...");
+                    display_update();
+                } else if (res_scan == RES_ENROLLMENT_FAIL) {
+                    display_string(1, "Try again...");
+                    display_update();
+                } else if (res_scan == RES_RECEIVE_FAIL) {
+                    success = 0x0;
+                    break;
+                }
+            } while (res_scan == RES_NO_FINGER || res_scan == RES_ENROLLMENT_FAIL);
+
+            res_to_buffer = image_to_buffer(buffer_id);
+
+            if (res_to_buffer == RES_WEAK_PRINT_FAIL) {
+                display_string(1, "Bad scan...");
+                display_update();
+            } else if (res_to_buffer == RES_GEN_IMAGE_FAIL) {
+                display_string(1, "Try again...");
+                display_update();
+            } else if (res_to_buffer == RES_RECEIVE_FAIL || success == 0x0) {
+                success = 0x0;
+                break;
+            }
+        } while (res_to_buffer == RES_WEAK_PRINT_FAIL || res_to_buffer == RES_GEN_IMAGE_FAIL);
+    }
+
     change_led(0);
 
     display_string(1, "Remove finger");
     display_string(2, "from sensor!");
     display_update();
 
-    CURRENT_STATE = SCAN_NEXT;
+    return success;
+}
 
-    while(INTSTAT & 0x800);
+void enroll_print_1st(){
+    char res_scan = scan_finger(CHAR_BUFFER_1);
+    if(res_scan == 0x0){
+        display_string(1, "Request error");
+        display_update();
+        CURRENT_STATE = ERROR_STATE;
+        _delay(2500);
+    } else {
+        CURRENT_STATE = SCAN_NEXT;
 
-    display_string(1, "Put finger on");
-    display_string(2, "sensor for");
-    display_string(3, "2nd scan");
-    display_update();
+        while (INTSTAT & 0x800);
+
+        display_string(1, "Put finger on");
+        display_string(2, "sensor for");
+        display_string(3, "2nd scan");
+        display_update();
+    }
 }
 
 
 void enroll_print_2nd(){
-    display_string(1, "Keep finger");
-    display_string(2, "on sensor!");
-    display_update();
+    char res_scan = scan_finger(CHAR_BUFFER_2);
+    if(res_scan == 0x0){
+        display_string(1, "Request error");
+        display_update();
+        CURRENT_STATE = ERROR_STATE;
+        _delay(2500);
+    } else {
+        CURRENT_STATE = DEFAULT_STATE;
 
-    uint8_t res_led = change_led(1);
-    uint8_t res_scan = scan_print();
-    uint8_t res_to_buffer = image_to_buffer(CHAR_BUFFER_2);
-    change_led(0);
+        while (INTSTAT & 0x800);
 
-    display_string(1, "Remove finger");
-    display_string(2, "from sensor!");
-    display_update();
+        display_string(1, "Making model...");
+        display_string(2, "");
+        display_string(3, "");
+        display_update();
 
-    CURRENT_STATE = DEFAULT_STATE;
+        uint8_t res_model = generate_print_model();
+        if(res_model == RES_COMBINE_FAIL){
+            display_string(1, "Not the same");
+            display_string(2, "Finger, redo...");
+            display_update();
+        } else if(res_model == RES_RECEIVE_FAIL){
+            display_string(1, "Request error");
+            display_update();
+            CURRENT_STATE = ERROR_STATE;
+            _delay(2500);
+        }else {
+            uint8_t res_store = save_print_to_flash(CHAR_BUFFER_1);
 
-    while(INTSTAT & 0x800);
-
-    display_string(1, "Making model...");
-    display_string(2, "");
-    display_string(3, "");
-    display_update();
-
-    uint8_t res_model = generate_print_model();
-    uint8_t res_store = save_print_to_flash(CHAR_BUFFER_1);
-
-    display_string(1, "Model created!");
-    display_string(2, "Model stored!");
-    display_update();
+            display_string(1, "Model created!");
+            display_string(2, "Model stored!");
+            display_update();
+        }
+    }
 }
 
 
 uint8_t auth_chain(uint8_t *match_score){
-    display_string(1, "Keep finger");
-    display_string(2, "on sensor!");
+    char res_scan = scan_finger(CHAR_BUFFER_1);
+    uint8_t res_match;
+    if(res_scan == 0x0){
+        display_string(1, "Request error");
+        display_update();
+        CURRENT_STATE = ERROR_STATE;
+        res_match = 0x1;
+        _delay(2500);
+    } else {
+        while (INTSTAT & 0x800);
 
-    uint8_t res_led = change_led(1);
-    uint8_t res_scan = scan_print();
-    change_led(0);
+        display_string(1, "Authenticating...");
+        display_string(2, "");
+        display_string(3, "");
+        display_update();
 
-    display_string(1, "Remove finger");
-    display_string(2, "from sensor!");
-    display_update();
-
-    while(INTSTAT & 0x800);
-
-    display_string(1, "Authenticating...");
-    display_string(2, "");
-    display_string(3, "");
-    display_update();
-
-    uint8_t res_to_buffer = image_to_buffer(CHAR_BUFFER_1);
-    uint8_t res_load = load_print_from_flash(CHAR_BUFFER_2);
-    uint8_t res_match = match_buffers(match_score);
+        uint8_t res_load = load_print_from_flash(CHAR_BUFFER_2);
+        res_match = match_buffers(match_score);
+    }
 
     return res_match;
 }
@@ -101,11 +156,11 @@ void authenticate(){
     uint8_t match_score[2];
     uint8_t res_match = auth_chain(match_score);
 
-    if(res_match == 0x08){
+    if(res_match == RES_MATCH_FAIL){
         display_string(1, "Fingers DO NOT");
         display_string(2, "match!");
         display_update();
-    } else if(res_match == 0x0){
+    } else if(res_match == RES_SUCCESS){
         CURRENT_STATE = DEFAULT_STATE;
         display_string(1, "Match! Score:");
         display_update();
@@ -122,16 +177,16 @@ void authenticate(){
 void arm_alarm(){
     uint8_t print_check = load_print_from_flash(CHAR_BUFFER_1);
 
-    if(print_check == 0x00){
+    if(print_check == RES_SUCCESS){
         uint8_t match_score[2];
         uint8_t res_match = auth_chain(match_score);
 
-        if(res_match == 0x08){
+        if(res_match == RES_MATCH_FAIL){
             display_string(1, "Fingers DO NOT");
             display_string(2, "match!");
             display_update();
             CURRENT_STATE = DEFAULT_STATE;
-        } else if(res_match == 0x0){
+        } else if(res_match == RES_SUCCESS){
             display_string(1, "Match!");
             display_string(2, "Alarm will arm");
             display_string(3, "in 20 sec");
@@ -150,7 +205,7 @@ void arm_alarm(){
             display_update();
             CURRENT_STATE = ERROR_STATE;
         }
-    } else if(print_check == 0x0C){
+    } else if(print_check == RES_TEMPLATE_ERROR){
         display_string(1, "No print avail");
         display_update();
         CURRENT_STATE = DEFAULT_STATE;
@@ -165,12 +220,12 @@ void disarm(){
     uint8_t match_score[2];
     uint8_t res_match = auth_chain(match_score);
 
-    if(res_match == 0x08){
+    if(res_match == RES_MATCH_FAIL){
         display_string(1, "Fingers DO NOT");
         display_string(2, "match!");
         display_update();
         CURRENT_STATE = ALARM_TRIGGERED;
-    } else if(res_match == 0x0){
+    } else if(res_match == RES_SUCCESS){
         CURRENT_STATE = DEFAULT_STATE;
         // TODO - Call US "unarm" and shut buzzer off
         display_string(1, "Alarm");
