@@ -175,8 +175,8 @@ void display_setup(void) {
     SPI2CONSET = 0x8000;
 
     display_init();
-    display_string(0, "KTH/ICT lab");
-    display_string(1, "Debug");
+    display_string(0, "Homesec device");
+    display_string(1, "By RH and LBF");
     display_string(2, "");
     display_update();
 }
