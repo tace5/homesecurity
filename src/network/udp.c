@@ -1,6 +1,10 @@
 
-void construct_udp_header(uint32_t source_port, uint32_t dest_port, uint32_t data_length, uint8_t * data) {
-
+void construct_udp_header(uint32_t source_port, uint32_t dest_port, uint32_t source_ip, uint32_t dest_ip, uint32_t protocol, uint32_t data_length, uint8_t * data) {
+  write_buffer_memory((uint8_t *) &source_port, 4);
+  write_buffer_memory((uint8_t *) &dest_port);
+  uint32_t udp_length = 8 + data_length;
+  write_buffer_memory((uint8_t *) &udp_length);
+  uint32_t checksum = (uint32_t) calculate_checksum(source_ip, dest_ip, protocol, data_length, data);
 }
 
 // Inspired by https://gist.github.com/fxlv/81209bbd150abfeaceb1f85ff076c9f3

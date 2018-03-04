@@ -1,5 +1,5 @@
 
-void construct_ipv4_header(uint32_t data_length, uint32_t ttl, uint32_t protocol, uint32_t source_ip, uint32_t dest_ip) {
+void construct_ipv4_header(uint32_t ttl, uint32_t protocol, uint32_t source_ip, uint32_t dest_ip) {
   uint32_t header[5];
 
   uint32_t version = 0x4;
@@ -11,6 +11,8 @@ void construct_ipv4_header(uint32_t data_length, uint32_t ttl, uint32_t protocol
   uint32_t identification = 0x0;
   uint32_t flags = 0x2;
   uint32_t fragment_offset = 0x0;
+
+  uint32_t checksum = 0x0;
 
   header[0] = (version << 28);
   header[0] |= (ihl << 24);
@@ -24,16 +26,15 @@ void construct_ipv4_header(uint32_t data_length, uint32_t ttl, uint32_t protocol
 
   header[2] = (ttl << 24);
   header[2] |= (protocol << 16);
+  header[2] |= checksum;
 
   header[3] = source_ip;
   header[4] = dest_ip;
 
-  uint32_t checksum = (uint32_t) calculate_checksum(header);
-  header[2] |= checksum;
-
   write_buffer_memory((uint8_t *) header, (ihl * 4));
 }
 
+// Unused
 uint16_t calculate_checksum(int * header) {
   int tot_length = ((header[0] & 0xf0000000) >> 28) * ((header[0] & 0xf000000) >> 24);
 
