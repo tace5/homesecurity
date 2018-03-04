@@ -37,18 +37,28 @@ uint32_t construct_http_request_header(char *storage, char request_type[], int r
     // Host
     s_i += write_to_storage((storage + s_i), HOST, sizeof(HOST));
     s_i += write_to_storage((storage + s_i), LINE_BREAK, sizeof(LINE_BREAK));
+    // Accept
+    s_i += write_to_storage((storage + s_i), ACCEPT, sizeof(ACCEPT));
+    s_i += write_to_storage((storage + s_i), LINE_BREAK, sizeof(LINE_BREAK));
     // Content Type
     s_i += write_to_storage((storage + s_i), CONTENT_TYPE, sizeof(CONTENT_TYPE));
     s_i += write_to_storage((storage + s_i), LINE_BREAK, sizeof(LINE_BREAK));
-    // Content Length
-    char len_char[digits(body_len)];
-    itoa(body_len, len_char);
 
-    s_i += write_to_storage((storage + s_i), CONTENT_LENGTH, sizeof(CONTENT_LENGTH));
-    s_i += write_to_storage((storage + s_i), len_char, sizeof(len_char));
+    // Content Length
+    // Only set content length if body is set
+    if(*body != ' ') {
+        char len_char[digits(body_len)];
+        itoa(body_len, len_char);  // Get ascii representation of body length
+        s_i += write_to_storage((storage + s_i), CONTENT_LENGTH, sizeof(CONTENT_LENGTH));
+        s_i += write_to_storage((storage + s_i), len_char, sizeof(len_char));
+    }
 
     // REQUEST BODY
+    if(*body != ' ') {
+        s_i += write_to_storage((storage + s_i), body, body_len);
+    }
 
+    return s_i;
 
 }
 
