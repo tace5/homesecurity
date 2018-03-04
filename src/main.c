@@ -33,14 +33,14 @@ int main(void) {
   enable_reception();
   /*uint8_t dest_address[6] = {0x44, 0x8a, 0x5b, 0x9f, 0x9d, 0x7b};
   uint8_t source_address[6] = {0x6e, 0x79, 0x8a, 0x9b, 0xee, 0x9d};
-  uint8_t data[11] = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'};
+  uint8_t data[11] = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'};*/
 
-  /*int header[5] = {0x4500003c, 0x1c464000, 0x40060000, 0xac100a63, 0xac100a0c};
+  int header[5] = {0x4500003c, 0x1c464000, 0x40060000, 0xac100a63, 0xac100a0c};
   int tot_length = ((header[0] & 0xf0000000) >> 28) * ((header[0] & 0xf000000) >> 24);
 
   int checksum = (int) calculate_checksum(header);
 
-  display_debug(1, &checksum);*/
+  display_debug(1, &checksum);
 
   while(1) {
     int distance = measure_dist();
