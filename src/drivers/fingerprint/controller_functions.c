@@ -1,204 +1,183 @@
 //
-// Created by Linus on 2018-02-26.
+// Created by Linus Bein Fahlander on 2018-03-03.
 //
 
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include <string.h>
 #include "controller.h"
+#include "commands.h"
 #include "../display/display_functions.h"
 #include "../../utils/utils.h"
 #include "../../state.h"
 
 
-void __attribute__ ((interrupt)) handle_interrupt();
-
-int check_for_errors(){
-    if(U2STA & 0x8){
-        display_string(1, "ERROR! Parity");
-        display_update();
-        _delay(1000);
-
-        return 1;
-    }
-
-    if(U2STA & 0x4){
-        display_string(1, "ERROR! Framing");
-        display_update();
-        _delay(1000);
-
-        return 1;
-    }
-
-    if(U2STA & 0x2){
-        display_string(1, "ERROR! Overflow");
-        display_update();
-        _delay(1000);
-
-        return 1;
-    }
-
-    return 0;
-}
-
-int get_total_package_length(int data_length){
-    return (2 + 4 + 1 + 2 + data_length + 2);
-}
-
-void handle_interrupt(){
-    IFSCLR(0) = FINGER_TOUCH_INT;
-    uint8_t state = CURRENT_STATE;
-    if(CURRENT_STATE != FINGER_OFF_INT){
-        CURRENT_STATE = FINGER_OFF_INT;
-    }
-
-    display_string(0, "Finger touched!");
+void enroll_print_1st(){
+    display_string(1, "Keep finger");
+    display_string(2, "on sensor!");
     display_update();
 
-    _delay(1000);
+    uint8_t res_led = change_led(1);
+    uint8_t res_scan = scan_print();
+    uint8_t res_to_buffer = image_to_buffer(CHAR_BUFFER_1);
+    change_led(0);
 
-    // TODO - Check for user settings and act accordingly
+    display_string(1, "Remove finger");
+    display_string(2, "from sensor!");
+    display_update();
 
-    switch(state) {
-        // Case: State = Default
-        case DEFAULT_STATE:
-            display_string(1, "State is default");
-            display_update();
-            break;
+    CURRENT_STATE = SCAN_NEXT;
 
-        // Case: State = Config mode
-        case CONFIG_MODE:
-            display_string(1, "State is conifg");
-            display_update();
-            state = DEFAULT_STATE;
-            break;
+    while(INTSTAT & 0x800);
 
-        // Case: State = Alarm is armed but not triggered
-        case ALARM_ARMED:
-            display_string(1, "State is alarm is armed");
-            display_update();
-            break;
-
-        // Case: State = Alarm is triggered
-        case ALARM_TRIGGERED:
-            display_string(1, "State is alarm blaring");
-            display_update();
-            break;
-
-        // Case: State = Finger is leaving sensor
-        case FINGER_OFF_INT:
-            CURRENT_STATE = DEFAULT_STATE;
-            display_string(1, "State is finger off");
-            display_update();
-            break;
-    }
-
-
+    display_string(1, "Put finger on");
+    display_string(2, "sensor for");
+    display_string(3, "2nd scan");
+    display_update();
 }
 
-uint8_t listen_for_acknowledgement(uint8_t * data_storage){
 
-    int i = 0;
-    uint8_t padding_data[9];  // Storage for the first 9 bytes before package data is transmitted
-    while (i < 9){
-        while (!(U2STA & 0xF));  // Wait for Buffer Data available or Errors
-        if(!check_for_errors()){
-            padding_data[i] = U2RXREG;
-            i++;
-        }
-        else{
-            break;  // TODO - Handle failure
-        }
-    }
+void enroll_print_2nd(){
+    display_string(1, "Keep finger");
+    display_string(2, "on sensor!");
+    display_update();
 
-    //Calculate how big the storage for the received confirmation code + data + checksum has to be.
-    int data_length = (padding_data[7] << 8) | padding_data[8];
-    uint8_t package_data[data_length];
-    i = 0;
-    while(i < data_length){
-        while (!(U2STA & 0xF));  // Wait for Buffer Data available or Errors
-        if(!check_for_errors()){
-            package_data[i] = U2RXREG;
-            i++;
-        }
-        else{
-            break;  // TODO - Handle failure
-        }
-    }
+    uint8_t res_led = change_led(1);
+    uint8_t res_scan = scan_print();
+    uint8_t res_to_buffer = image_to_buffer(CHAR_BUFFER_2);
+    change_led(0);
 
-    // Read additional data if any, skip checksum at the end of the package
-    if(data_length > 0x3){
-        int j = 1;
-        for (j; j < data_length - 2; ++j) {
-            data_storage[j - 1] = package_data[j];
-        }
-    }
+    display_string(1, "Remove finger");
+    display_string(2, "from sensor!");
+    display_update();
 
-    // Return the confirmation code
-    return *package_data;
+    CURRENT_STATE = DEFAULT_STATE;
 
+    while(INTSTAT & 0x800);
+
+    display_string(1, "Making model...");
+    display_string(2, "");
+    display_string(3, "");
+    display_update();
+
+    uint8_t res_model = generate_print_model();
+    uint8_t res_store = save_print_to_flash(CHAR_BUFFER_1);
+
+    display_string(1, "Model created!");
+    display_string(2, "Model stored!");
+    display_update();
 }
 
-void transmit_package(uint8_t * package, int package_len){
-    int i = 0;
-    while (i < package_len){
-        while(U2STA & (1 << 9));  // Wait until last transmit has finished (TRMT) and transmit buffer is empty (UTXBF)
-        U2TXREG = package[i];  // Set transmit buffer to current package byte
-        i++;
 
-        //DEBUG
-        /*
-        volatile unsigned snapshot = (*(volatile unsigned*)(0xA0003000 + (0xF44)));
-        snapshot = package[i];
-        char debug[16] = "T P nr ";
-        itoa(i, (debug + 7));
-        display_string(0, debug);
-        //char value[8];
-        //num32asc(value, (int) package[i]);
-        //display_string(1, value);
+uint8_t auth_chain(uint8_t *match_score){
+    display_string(1, "Keep finger");
+    display_string(2, "on sensor!");
+
+    uint8_t res_led = change_led(1);
+    uint8_t res_scan = scan_print();
+    change_led(0);
+
+    display_string(1, "Remove finger");
+    display_string(2, "from sensor!");
+    display_update();
+
+    while(INTSTAT & 0x800);
+
+    display_string(1, "Authenticating...");
+    display_string(2, "");
+    display_string(3, "");
+    display_update();
+
+    uint8_t res_to_buffer = image_to_buffer(CHAR_BUFFER_1);
+    uint8_t res_load = load_print_from_flash(CHAR_BUFFER_2);
+    uint8_t res_match = match_buffers(match_score);
+
+    return res_match;
+}
+
+
+void authenticate(){
+
+    uint8_t match_score[2];
+    uint8_t res_match = auth_chain(match_score);
+
+    if(res_match == 0x08){
+        display_string(1, "Fingers DO NOT");
+        display_string(2, "match!");
         display_update();
-        display_debug(1, &snapshot);
-        _delay(500);*/
+    } else if(res_match == 0x0){
+        CURRENT_STATE = DEFAULT_STATE;
+        display_string(1, "Match! Score:");
+        display_update();
+        int match = (int) (match_score[0] << 8) | match_score[1];
+        display_debug(1, &match);
+    } else{
+        display_string(1, "Request error");
+        display_update();
+        CURRENT_STATE = ERROR_STATE;
+    }
+
+}
+
+void arm_alarm(){
+    uint8_t print_check = load_print_from_flash(CHAR_BUFFER_1);
+
+    if(print_check == 0x00){
+        uint8_t match_score[2];
+        uint8_t res_match = auth_chain(match_score);
+
+        if(res_match == 0x08){
+            display_string(1, "Fingers DO NOT");
+            display_string(2, "match!");
+            display_update();
+            CURRENT_STATE = DEFAULT_STATE;
+        } else if(res_match == 0x0){
+            display_string(1, "Match!");
+            display_string(2, "Alarm will arm");
+            display_string(3, "in 20 sec");
+            display_update();
+
+            _delay(20000);
+            CURRENT_STATE = ALARM_ARMED;
+            // TODO - Call US sensor "arm" function
+
+            display_string(1, "Alarm active!");
+            display_string(2, "");
+            display_string(3, "");
+            display_update();
+        } else{
+            display_string(1, "Request error");
+            display_update();
+            CURRENT_STATE = ERROR_STATE;
+        }
+    } else if(print_check == 0x0C){
+        display_string(1, "No print avail");
+        display_update();
+        CURRENT_STATE = DEFAULT_STATE;
+    } else{
+        display_string(1, "Data error");
+        display_update();
+        CURRENT_STATE = ERROR_STATE;
     }
 }
 
-void pack(uint8_t pid, int data_length, uint8_t * data, int adder, uint8_t * storage) {
-    int len = data_length + 2; // Add 2 bytes to len count for checksum
-    int package_len = (2 + 4 + 1 + 2 + len);  // Calculate the total package length (HEADER + ADDER + PID + LENGTH + DATA(len + SUM)) bytes
+void disarm(){
+    uint8_t match_score[2];
+    uint8_t res_match = auth_chain(match_score);
 
-    //Set HEADER
-    storage[0] = (HEADER & 0xFF00) >> 8;
-    storage[1] = HEADER & 0xFF;
-
-    //Set ADDR
-    if(adder == 0){
-        adder = ADDR;
+    if(res_match == 0x08){
+        display_string(1, "Fingers DO NOT");
+        display_string(2, "match!");
+        display_update();
+        CURRENT_STATE = ALARM_TRIGGERED;
+    } else if(res_match == 0x0){
+        CURRENT_STATE = DEFAULT_STATE;
+        // TODO - Call US "unarm" and shut buzzer off
+        display_string(1, "Alarm");
+        display_string(2, "Deactivated!");
+        display_update();
+    } else{
+        display_string(1, "Request error");
+        display_update();
     }
-    storage[2] = (adder & 0xFF000000) >> (8 * 3);
-    storage[3] = (adder & 0xFF0000) >> (8 * 2);
-    storage[4] = (adder & 0xFF00) >> 8;
-    storage[5] = (adder & 0xFF);
-
-    //Set Package ID
-    storage[6] = pid;
-
-    //Set Package Length
-    storage[7] = (len & 0xFF00) >> (1 * 8);
-    storage[8] = len & 0xFF;
-
-    //Set Package Data
-    int i;
-    for (i = 0; i < data_length; ++i) {
-        storage[9 + i] = data[i];
-    }
-
-    //Set Package Checksum
-    int checksum = (pid + len + *data) & 0xFFFF;
-    storage[9 + i] = (checksum & 0xFF00) >> 8;
-    storage[10 + i] = checksum & 0xFF;
-}
-
-int unpack(int package) {
-    //TODO - Logic for unpacking the package contents depending on package type
-    return 0;
 }

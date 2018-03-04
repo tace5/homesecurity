@@ -9,7 +9,8 @@
 #define CONFIG_MODE     0x1
 #define ALARM_ARMED     0x2
 #define ALARM_TRIGGERED 0x3
-#define FINGER_OFF_INT  0x4
+#define SCAN_NEXT       0x4
+#define ERROR_STATE     0xF
 
 uint8_t CURRENT_STATE = 0x0;
 
