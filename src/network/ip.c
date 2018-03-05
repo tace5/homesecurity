@@ -35,15 +35,25 @@ void construct_ipv4_header(uint32_t ttl, uint32_t protocol, uint32_t source_ip, 
 }
 
 // Unused
-uint16_t calculate_ip_checksum(int * header) {
-  int tot_length = ((header[0] & 0xf0000000) >> 28) * ((header[0] & 0xf000000) >> 24);
+uint16_t calculate_ip_checksum(uint32_t * header) {
+  uint32_t sum = 0;
+  int i;
+  for (i = 0; i < 5; ++i)
+  {
+    uint16_t temp1 = (header[i] & 0xFFFF0000) >> 16;
+    uint16_t temp2 = (header[i] & 0xFFFF);
 
-  uint16_t sum = 0;
-  uint8_t mask = 0xffff << (tot_length * 4 - 16);
-  while (tot_length--) {
-    sum += *header & mask;
-    mask = mask >> 16;
+    sum += temp1;
+    sum += temp2;
   }
 
-  return ~sum;
+  while(sum & 0xFFFF0000){
+    uint16_t carry = (sum & 0xFFFF0000) >> 16;
+    sum = sum & 0xFFFF;
+    sum += carry;
+  }
+
+  uint16_t checksum = (uint16_t) sum & 0xFFFF;
+
+  return ~checksum;
 }
