@@ -78,19 +78,19 @@ void enable_reception() {
   bit_field_set(ECON1, RXEN);
 }
 
-void send_ethernet_frame(volatile uint8_t * dest_mac, volatile uint8_t * source_mac, int length, volatile uint8_t * data) { // May needs to be reworked
+void construct_ethernet_frame(volatile uint8_t * dest_mac, volatile uint8_t * source_mac) { // May needs to be reworked
   uint8_t protocol[2] = {0x08, 0x00};
 
   write_buffer_memory(dest_mac, 6);
   write_buffer_memory(source_mac, 6);
   write_buffer_memory(protocol, 2);
+}
 
-  //write_buffer_memory()
-
-  if (length <= 46) {
+void send_packet(uint32_t length) {
+  if (length <= 64) {
     write_control_register(ETXNDL, 64);
-  } else if (length > 46) {
-    uint16_t end_pointer = 18 + length;
+  } else if (length > 64) {
+    uint16_t end_pointer = length;
     write_control_register(ETXNDL, (end_pointer & 0xff));
     write_control_register(ETXNDH, ((end_pointer & 0x1f00) >> 8));
   }

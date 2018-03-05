@@ -13,7 +13,9 @@
 #include "drivers/ethernet/enc28j60_utils.h"
 #include "drivers/ethernet/ethernet.h"
 #include "drivers/us_sensor/us_sensor.h"
-#include "protocols/ip.h"
+#include "network/ip.h"
+#include "network/udp.h"
+#include "network/http.h"
 
 void user_isr() {
 
@@ -31,22 +33,32 @@ int main(void) {
   init_mac(max_frame_length, mac_address);
   set_receive_buffer_pointers(receive_buffer_start, receive_buffer_end);
   enable_reception();
-  /*uint8_t dest_address[6] = {0x44, 0x8a, 0x5b, 0x9f, 0x9d, 0x7b};
-  uint8_t source_address[6] = {0x6e, 0x79, 0x8a, 0x9b, 0xee, 0x9d};
-  uint8_t data[11] = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'};*/
 
-  int header[5] = {0x4500003c, 0x1c464000, 0x40060000, 0xac100a63, 0xac100a0c};
-  int tot_length = ((header[0] & 0xf0000000) >> 28) * ((header[0] & 0xf000000) >> 24);
+  uint8_t dest_mac[6] = {0x9c, 0x5c, 0x8e, 0xbf, 0x87, 0x57};
 
-  int checksum = (int) calculate_checksum(header);
+  char store[200];
+  char * res = "GET";
+  char * path = "/index.html";
+  uint32_t request_len = construct_http_request_header(store, res, 3, path, 11, EMPTY_BODY, 0);
+  construct_ethernet_frame(dest_mac, mac_address);
+  construct_ipv4_header(1, 0x11, 0xc0a81401, 0xc0a814c8, (request_len + 8));
+  construct_udp_header(80, 80, 0xc0a81401, 0xc0a814c8, 0x11, request_len, store);
+  write_buffer_memory(store, request_len);
+  send_packet(request_len + 20 + 8 + 14);
+  int temp = (int) store[request_len - 2];
+  display_debug(1, &temp);
+  //display_debug(0, (int *) &request_len);
 
-  display_debug(1, &checksum);
+  int intie = (int) read_control_register(ETXNDL);
+  //display_debug(1, &intie);
 
-  while(1) {
-    int distance = measure_dist();
-
-    display_debug(1, &distance);
-  }
+  int txif;
+  do {
+    txif = (int) (read_control_register(EIR) & TXIF);
+    if (txif) {
+      //display_debug(1, &txif);
+    }
+  } while (!txif);
 
   return 0;
 }

@@ -13,7 +13,8 @@ void init_mac(uint16_t max_frame_length, volatile uint8_t * mac_address);
 void select_memory_bank(uint8_t bank);
 uint8_t is_mac_mii_register(uint8_t addr);
 void enable_reception();
-void send_ethernet_frame(volatile uint8_t * dest_mac, volatile uint8_t * source_mac, int length, volatile uint8_t * data);
+void construct_ethernet_frame(volatile uint8_t * dest_mac, volatile uint8_t * source_mac);
+void send_packet(uint32_t length);
 
 #include "enc28j60_utils.c"
 
