@@ -5,11 +5,11 @@
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include <string.h>
-#include "controller.h"
-#include "commands.h"
-#include "../display/display_functions.h"
-#include "../../utils/utils.h"
-#include "../../state.h"
+#include "../drivers/fingerprint/commands.h"
+#include "fingerprint_sensor.h"
+#include "../drivers/display/display_functions.h"
+#include "../utils/utils.h"
+#include "../state.h"
 
 
 char scan_finger(uint8_t buffer_id){
@@ -80,9 +80,9 @@ void enroll_print_1st(){
 
         while (INTSTAT & 0x800);
 
-        display_string(1, "Put finger on");
-        display_string(2, "sensor for");
-        display_string(3, "2nd scan");
+        display_string(1, "1st Scan Done!");
+        display_string(2, "");
+        display_string(3, "");
         display_update();
     }
 }
@@ -110,6 +110,7 @@ void enroll_print_2nd(){
             display_string(1, "Not the same");
             display_string(2, "Finger, redo...");
             display_update();
+            _delay(1500);
         } else if(res_model == RES_RECEIVE_FAIL){
             display_string(1, "Request error");
             display_update();
@@ -121,6 +122,8 @@ void enroll_print_2nd(){
             display_string(1, "Model created!");
             display_string(2, "Model stored!");
             display_update();
+
+            _delay(1500);
         }
     }
 }
@@ -160,12 +163,12 @@ void authenticate(){
         display_string(1, "Fingers DO NOT");
         display_string(2, "match!");
         display_update();
+        _delay(1500);
     } else if(res_match == RES_SUCCESS){
         CURRENT_STATE = DEFAULT_STATE;
-        display_string(1, "Match! Score:");
+        display_string(1, "Match!");
         display_update();
-        int match = (int) (match_score[0] << 8) | match_score[1];
-        display_debug(1, &match);
+        _delay(1500);
     } else{
         display_string(1, "Request error");
         display_update();
@@ -186,6 +189,7 @@ void arm_alarm(){
             display_string(2, "match!");
             display_update();
             CURRENT_STATE = DEFAULT_STATE;
+            _delay(1500);
         } else if(res_match == RES_SUCCESS){
             display_string(1, "Match!");
             display_string(2, "Alarm will arm");
@@ -194,7 +198,8 @@ void arm_alarm(){
 
             _delay(20000);
             CURRENT_STATE = ALARM_ARMED;
-            // TODO - Call US sensor "arm" function
+
+            // TODO - Call US "arm"
 
             display_string(1, "Alarm active!");
             display_string(2, "");
@@ -225,12 +230,14 @@ void disarm(){
         display_string(2, "match!");
         display_update();
         CURRENT_STATE = ALARM_TRIGGERED;
+        _delay(1500);
     } else if(res_match == RES_SUCCESS){
         CURRENT_STATE = DEFAULT_STATE;
         // TODO - Call US "unarm" and shut buzzer off
         display_string(1, "Alarm");
         display_string(2, "Deactivated!");
         display_update();
+        _delay(1500);
     } else{
         display_string(1, "Request error");
         display_update();

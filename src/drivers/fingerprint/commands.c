@@ -4,7 +4,7 @@
 
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
-#include "controller.h"
+#include "../../controllers/fingerprint_sensor.h"
 #include "commands.h"
 #include "../display/display_functions.h"
 #include "../../utils/utils.h"

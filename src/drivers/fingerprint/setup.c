@@ -6,7 +6,7 @@
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "setup.h"
 #include "../../utils/utils.h"
-#include "controller.h"
+#include "../../controllers/fingerprint_sensor.h"
 #include "commands.h"
 
 void init() {
