@@ -65,7 +65,9 @@ void check_switches(){
 
 
 void default_flow(){
-    if(check_for_stored_print()) {
+    _delay(250);
+    char check = 0x1; //check_for_stored_print();
+    if(check == 0x1) {
         display_string(0, "Ready to");
         display_string(1, "be armed!");
         display_string(2, "");

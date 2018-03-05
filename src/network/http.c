@@ -6,6 +6,7 @@
 #include "http.h"
 #include "../drivers/ethernet/enc28j60_instructions.h"
 #include "../utils/utils.h"
+#include "../third_party/jsmn/jsmn.h"
 
 
 int write_to_storage(char *storage, char data[], int data_len){
@@ -62,9 +63,11 @@ uint32_t construct_http_request_header(char *storage, char request_type[], int r
 
 }
 
-/* Returns length of data */
-uint32_t construct_http_response_header(char *storage, uint16_t res_code) {
-    // Headers: Content-Type, Content-Length, Location, Server
-    // Allow, Access-Control-Allow-*, Accept-Patch
-
+/* Returns status code */
+uint32_t deconstruct_http_response(uint8_t *storage) {
+    uint8_t i = 0;
+    while(i < 10){
+        while (!(read_control_register(EIR) & PKTIF));
+        i++;
+    }
 }

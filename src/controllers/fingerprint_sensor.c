@@ -10,6 +10,7 @@
 #include "../drivers/display/display_functions.h"
 #include "../utils/utils.h"
 #include "../state.h"
+#include "us_sensor.h"
 
 
 char scan_finger(uint8_t buffer_id){
@@ -118,6 +119,8 @@ void enroll_print_2nd(){
             _delay(2500);
         }else {
             uint8_t res_store = save_print_to_flash(CHAR_BUFFER_1);
+            int temp = (int) res_store;
+            display_debug(1, &temp);
 
             display_string(1, "Model created!");
             display_string(2, "Model stored!");
@@ -193,18 +196,21 @@ void arm_alarm(){
         } else if(res_match == RES_SUCCESS){
             display_string(1, "Match!");
             display_string(2, "Alarm will arm");
-            display_string(3, "in 20 sec");
+            display_string(3, "in 10 sec");
             display_update();
 
-            _delay(20000);
+            _delay(10000);
             CURRENT_STATE = ALARM_ARMED;
 
-            // TODO - Call US "arm"
-
-            display_string(1, "Alarm active!");
+            display_string(0, "Alarm active!");
+            display_string(1, "");
             display_string(2, "");
             display_string(3, "");
             display_update();
+
+            IFSCLR(0) = FINGER_TOUCH_INT;
+
+            arm_us();
         } else{
             display_string(1, "Request error");
             display_update();
@@ -233,11 +239,12 @@ void disarm(){
         _delay(1500);
     } else if(res_match == RES_SUCCESS){
         CURRENT_STATE = DEFAULT_STATE;
-        // TODO - Call US "unarm" and shut buzzer off
+
+        disarm_us();
+
         display_string(1, "Alarm");
         display_string(2, "Deactivated!");
         display_update();
-        _delay(1500);
     } else{
         display_string(1, "Request error");
         display_update();

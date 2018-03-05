@@ -30,5 +30,5 @@ void setup() {
 void register_interrupts() {
     INTCONSET = 0x4;
     IECSET(0) = FINGER_TOUCH_INT;      // Enable INT2 interrupt
-    IPCSET(2) = 0x1B000000; // Set priority = 6 and sub = 3
+    IPCSET(2) = 0x1F000000; // Set priority = 7 and sub = 3
 }

@@ -23,7 +23,6 @@ int get_total_package_length(int data_length);
 
 void handle_interrupt();
 
-#include "fingerprint_core.c"
 
 // CONTROLLER FUNCTIONS
 
@@ -39,7 +38,7 @@ void arm_alarm();
 
 void disarm();
 
-
+#include "fingerprint_core.c"
 #include "fingerprint_sensor.c"
 
 #endif //HOMESECURITY_FINGERPRINT_SENSOR_H_H

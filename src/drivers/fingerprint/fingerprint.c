@@ -59,7 +59,7 @@ uint8_t listen_for_acknowledgement(uint8_t * data_storage){
 void transmit_package(uint8_t * package, int package_len){
     int i = 0;
     while (i < package_len){
-        while(U2STA & (1 << 9));  // Wait until last transmit has finished (TRMT) and transmit buffer is empty (UTXBF)
+        while(U2STA & (1 << 9));  // Wait until last transmit has finished (TRMT) ( || !(U2STA & (1 << 8))) and transmit buffer is empty (UTXBF)
         U2TXREG = package[i];  // Set transmit buffer to current package byte
         i++;
     }
