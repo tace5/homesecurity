@@ -61,7 +61,7 @@ void handle_interrupt(){
     switch(state) {
         // Case: State = Default
         case DEFAULT_STATE:
-            display_string(0, "Arming alarm...");
+            display_string(0, "Arming alarm");
             display_update();
             arm_alarm();
             break;
@@ -82,14 +82,14 @@ void handle_interrupt(){
 
         // Case: State = Alarm is armed but not triggered
         case ALARM_ARMED:
-            display_string(0, "Deactivating...");
+            display_string(0, "Deactivating");
             display_update();
             authenticate();
             break;
 
         // Case: State = Alarm is triggered
         case ALARM_TRIGGERED:
-            display_string(0, "Deactivating...");
+            display_string(0, "Deactivating");
             display_update();
             authenticate();
             break;
@@ -97,17 +97,19 @@ void handle_interrupt(){
         // Case: State = Something has gone wrong, restart is maybe a solution
         case ERROR_STATE:
             display_string(0, "An error has");
-            display_string(1, "Occurred, please");
+            display_string(1, "Occurred");
             display_string(2, "Restart");
             display_update();
             break;
         default:
             display_string(0, "An error has");
-            display_string(1, "Occurred, please");
+            display_string(1, "Occurred");
             display_string(2, "Restart");
             display_update();
             break;
     }
 
     IFSCLR(0) = FINGER_TOUCH_INT;
+
+    _delay(500);
 }

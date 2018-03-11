@@ -22,8 +22,8 @@ void config_uart() {  // Using UART2 on PIN 39 (RX) and PIN 40 (TX)
 
 void setup() {
     TRISESET = 0x1;  // Set port connected to Sout to input (PIN 26) and port connected to Vtouch to output (PIN 27)
-    register_interrupts();
     config_uart();
+    register_interrupts();
     force_handshake();
 }
 

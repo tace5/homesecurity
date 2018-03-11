@@ -34,10 +34,10 @@ char scan_finger(uint8_t buffer_id){
                 res_scan = scan_print();
 
                 if (res_scan == RES_NO_FINGER) {
-                    display_string(1, "No finger...");
+                    display_string(1, "No finger");
                     display_update();
                 } else if (res_scan == RES_ENROLLMENT_FAIL) {
-                    display_string(1, "Try again...");
+                    display_string(1, "Try again");
                     display_update();
                 } else if (res_scan == RES_RECEIVE_FAIL) {
                     success = 0x0;
@@ -48,10 +48,10 @@ char scan_finger(uint8_t buffer_id){
             res_to_buffer = image_to_buffer(buffer_id);
 
             if (res_to_buffer == RES_WEAK_PRINT_FAIL) {
-                display_string(1, "Bad scan...");
+                display_string(1, "Bad scan");
                 display_update();
             } else if (res_to_buffer == RES_GEN_IMAGE_FAIL) {
-                display_string(1, "Try again...");
+                display_string(1, "Try again");
                 display_update();
             } else if (res_to_buffer == RES_RECEIVE_FAIL || success == 0x0) {
                 success = 0x0;
@@ -101,7 +101,7 @@ void enroll_print_2nd(){
 
         while (INTSTAT & 0x800);
 
-        display_string(1, "Making model...");
+        display_string(1, "Making model");
         display_string(2, "");
         display_string(3, "");
         display_update();
@@ -109,7 +109,7 @@ void enroll_print_2nd(){
         uint8_t res_model = generate_print_model();
         if(res_model == RES_COMBINE_FAIL){
             display_string(1, "Not the same");
-            display_string(2, "Finger, redo...");
+            display_string(2, "Finger, redo");
             display_update();
             _delay(1500);
         } else if(res_model == RES_RECEIVE_FAIL){
@@ -144,7 +144,7 @@ uint8_t auth_chain(uint8_t *match_score){
     } else {
         while (INTSTAT & 0x800);
 
-        display_string(1, "Authenticating...");
+        display_string(1, "Authenticating");
         display_string(2, "");
         display_string(3, "");
         display_update();
@@ -163,15 +163,15 @@ void authenticate(){
     uint8_t res_match = auth_chain(match_score);
 
     if(res_match == RES_MATCH_FAIL){
-        display_string(1, "Fingers DO NOT");
+        display_string(1, "Fingers DONT");
         display_string(2, "match!");
         display_update();
-        _delay(1500);
+        _delay(500);
     } else if(res_match == RES_SUCCESS){
         CURRENT_STATE = DEFAULT_STATE;
         display_string(1, "Match!");
         display_update();
-        _delay(1500);
+        _delay(500);
     } else{
         display_string(1, "Request error");
         display_update();
@@ -188,11 +188,11 @@ void arm_alarm(){
         uint8_t res_match = auth_chain(match_score);
 
         if(res_match == RES_MATCH_FAIL){
-            display_string(1, "Fingers DO NOT");
+            display_string(1, "Fingers DONT");
             display_string(2, "match!");
             display_update();
             CURRENT_STATE = DEFAULT_STATE;
-            _delay(1500);
+            _delay(500);
         } else if(res_match == RES_SUCCESS){
             display_string(1, "Match!");
             display_string(2, "Alarm will arm");
@@ -232,19 +232,18 @@ void disarm(){
     uint8_t res_match = auth_chain(match_score);
 
     if(res_match == RES_MATCH_FAIL){
-        display_string(1, "Fingers DO NOT");
+        display_string(1, "Fingers DONT");
         display_string(2, "match!");
         display_update();
         CURRENT_STATE = ALARM_TRIGGERED;
         _delay(1500);
     } else if(res_match == RES_SUCCESS){
         CURRENT_STATE = DEFAULT_STATE;
-
         disarm_us();
-
         display_string(1, "Alarm");
         display_string(2, "Deactivated!");
         display_update();
+        _delay(500);
     } else{
         display_string(1, "Request error");
         display_update();

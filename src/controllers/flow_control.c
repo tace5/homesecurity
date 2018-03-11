@@ -12,76 +12,35 @@
 uint8_t last_state = 0xFF;
 
 void main_flow(){
-    check_switches();
-
-    char change_flag = 0x0;
-    if (last_state != CURRENT_STATE){
-        change_flag = 0x1;
-        last_state = CURRENT_STATE;
-    }
     switch (CURRENT_STATE){
         case DEFAULT_STATE:
-            if(change_flag){
-                default_flow();
-            }
+            default_flow();
             break;
         case CONFIG_MODE:
-            if(change_flag){
-                config_flow();
-            }
+            config_flow();
             break;
         case ALARM_ARMED:
-            if(change_flag){
-                armed_flow();
-            }
+            armed_flow();
             break;
         case ALARM_TRIGGERED:
-            if(change_flag){
-                triggered_flow();
-            }
+            triggered_flow();
             break;
         case SCAN_NEXT:
-            if(change_flag){
-                scan_next_flow();
-            }
+            scan_next_flow();
             break;
         case ERROR_STATE:
-            if(change_flag){
-                error_flow();
-            }
+            error_flow();
             break;
-    }
-}
-
-
-void check_switches(){
-    if(PORTE & 0x10){
-        drop_prints_in_flash();
-        CURRENT_STATE = DEFAULT_STATE;
-    }else if(PORTE & 0x8){
-        CURRENT_STATE = CONFIG_MODE;
     }
 }
 
 
 void default_flow(){
-    _delay(250);
-    char check = 0x1; //check_for_stored_print();
-    if(check == 0x1) {
-        display_string(0, "Ready to");
-        display_string(1, "be armed!");
-        display_string(2, "");
-        display_string(3, "");
-        display_update();
-    } else{
-        display_string(0, "Device needs to");
-        display_string(1, "be configured!");
-        display_string(2, "");
-        display_string(3, "");
-        display_update();
-    }
-
-    main_flow();
+    display_string(0, "Ready to");
+    display_string(1, "be armed!");
+    display_string(2, "");
+    display_string(3, "");
+    display_update();
 }
 
 
@@ -91,8 +50,6 @@ void config_flow(){
     display_string(2, "");
     display_string(3, "");
     display_update();
-
-    main_flow();
 }
 
 
@@ -102,8 +59,6 @@ void armed_flow(){
     display_string(2, "");
     display_string(3, "");
     display_update();
-
-    main_flow();
 }
 
 
@@ -113,8 +68,6 @@ void triggered_flow(){
     display_string(2, "ALARM ALARM");
     display_string(3, "PRESS FINGER!");
     display_update();
-
-    main_flow();
 }
 
 
@@ -124,8 +77,6 @@ void scan_next_flow(){
     display_string(2, "Again");
     display_string(3, "");
     display_update();
-
-    main_flow();
 }
 
 
@@ -135,8 +86,6 @@ void error_flow(){
     display_string(2, "PLEASE");
     display_string(3, "RESTART");
     display_update();
-
-    main_flow();
 }
 
 
