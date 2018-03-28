@@ -33,14 +33,9 @@ void init_mac(uint16_t max_frame_length, volatile uint8_t * mac_address) { // Se
   } while(!ost_is_ready);
 
   select_memory_bank(2);
-  uint8_t macon1_bits = MARXEN;
-  macon1_bits |= TXPAUS;
-  macon1_bits |= RXPAUS;
-  bit_field_set(MACON1, macon1_bits);
+  bit_field_set(MACON1, MARXEN);
 
-  uint8_t macon3_bits = PADCFG0 | PADCFG1 | TXCRCEN | FULDPX;
-  // Possibly must set phy-register for full duplex mode
-  bit_field_set(MACON3, macon3_bits);
+  bit_field_set(MACON3, PADCFG0 | PADCFG1 | TXCRCEN);
 
   bit_field_set(MACON4, DEFER);
 
@@ -48,8 +43,9 @@ void init_mac(uint16_t max_frame_length, volatile uint8_t * mac_address) { // Se
   uint8_t max_frame_length_low = (uint8_t) (max_frame_length & 0xff);
   write_control_register(MAMXFLH, max_frame_length_high);
   write_control_register(MAMXFLL, max_frame_length_low);
-  write_control_register(MABBIPG, 0x15);
+  write_control_register(MABBIPG, 0x12);
   write_control_register(MAIPGL, 0x12);
+  write_control_register(MAIPGH, 0xc);
   select_memory_bank(3);
   write_control_register(MAADR1, mac_address[0]);
   write_control_register(MAADR2, mac_address[1]);
@@ -79,7 +75,7 @@ void enable_reception() {
 }
 
 void construct_ethernet_frame(volatile uint8_t * dest_mac, volatile uint8_t * source_mac) { // May needs to be reworked
-  uint8_t protocol[2] = {0x08, 0x00};
+  uint8_t protocol[2] = {0x81, 0x00};
 
   write_buffer_memory(dest_mac, 6);
   write_buffer_memory(source_mac, 6);

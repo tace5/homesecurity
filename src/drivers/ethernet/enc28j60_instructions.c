@@ -49,10 +49,6 @@ void write_buffer_memory(volatile uint8_t * data, uint32_t length) {
   PORTECLR = SS1;
   spi1_transfer(instruction);
   while (length--) {
-    /*if (length != 0) {
-      int temp = (int) *data;
-      display_debug(1, &temp);
-    }*/
     spi1_transfer(*data++);
   }
   PORTESET = SS1;

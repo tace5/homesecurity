@@ -11,8 +11,6 @@
 #include "../state.h"
 
 
-void __attribute__ ((interrupt)) handle_interrupt();
-
 int check_for_errors(){
     if(U2STA & 0x8){
         display_string(1, "ERROR! Parity");

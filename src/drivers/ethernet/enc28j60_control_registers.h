@@ -61,6 +61,7 @@
 
 // Bank 2
 #define MACON1    0x0
+#define MACON2    0x1
 #define MACON3    0x2
 #define MACON4    0x3
 #define MABBIPG   0x4
@@ -94,6 +95,8 @@
 #define EFLOCON   0x17
 #define EPAUSL    0x18
 #define EPAUSH    0x19
+
+#define PHCON1    0x0
 
 /*
   Register fields
@@ -163,5 +166,14 @@
 #define DEFER   0x40
 #define BPEN    0x20
 #define NOPKOFF 0x10
+
+// MISTAT
+#define BUSY    0x0
+
+// MICMD
+#define MIIRD   0x0
+
+// PHCON1
+#define PDPXMD  0x100
 
 #endif //HOMESECURITY_ENC28J60_CONTROL_REGISTERS_H
