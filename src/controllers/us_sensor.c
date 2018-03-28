@@ -15,9 +15,11 @@ void arm_us(){
     int current_measure;
     do{
         current_measure = measure_dist();
-    } while (current_measure + 5 >= ALARM_DISTANCE && ALARM_DISTANCE != 0);
+    } while ((current_measure + 15) >= ALARM_DISTANCE && ALARM_DISTANCE != 0);
 
-    CURRENT_STATE = ALARM_TRIGGERED;
+    if(ALARM_DISTANCE != 0){
+        CURRENT_STATE = ALARM_TRIGGERED;
+    }
     //TODO - Call API controller
 
 }

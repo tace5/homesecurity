@@ -29,7 +29,7 @@ int measure_dist(void) {
   while (PORTE & ECHO);  // Measure hold time of response pulse
   T1CONCLR = 0x8000; // Stop timer
 
-  display_debug(1, &TMR1);
+  //display_debug(1, &TMR1);
 
   return ((TMR1 * 256) / (80 * 58));
 }
