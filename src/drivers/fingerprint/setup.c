@@ -13,11 +13,11 @@ void init() {
     _delay(1000);  // Sleep for 1s to let sensor startup
 }
 
-void config_uart() {  // Using UART2 on PIN 39 (RX) and PIN 40 (TX)
-    U2BRG = gen_UxBRG(80000000, 57600);
-    U2STA = 0;
-    U2MODESET = 0x8000;  // MODE bits : 1000 0000 0000 0000
-    U2STASET = 0x1400;  // Status and Control bits : 0001 0100 0000 0000
+void config_uart() {  // Using UART1 on PIN 0 (RX) and PIN 1 (TX)
+    U1BRG = gen_UxBRG(80000000, 57600);
+    U1STA = 0;
+    U1MODESET = 0x8000;  // MODE bits : 1000 0000 0000 0000
+    U1STASET = 0x1400;  // Status and Control bits : 0001 0100 0000 0000
 }
 
 void setup() {

@@ -18,9 +18,9 @@ uint8_t listen_for_acknowledgement(uint8_t * data_storage){
     int i = 0;
     uint8_t padding_data[9];  // Storage for the first 9 bytes before package data is transmitted
     while (i < 9){
-        while (!(U2STA & 0xF));  // Wait for Buffer Data available or Errors
+        while (!(U1STA & 0xF));  // Wait for Buffer Data available or Errors
         if(!check_for_errors()){
-            padding_data[i] = U2RXREG;
+            padding_data[i] = U1RXREG;
             i++;
         }
         else{
@@ -33,9 +33,9 @@ uint8_t listen_for_acknowledgement(uint8_t * data_storage){
     uint8_t package_data[data_length];
     i = 0;
     while(i < data_length){
-        while (!(U2STA & 0xF));  // Wait for Buffer Data available or Errors
+        while (!(U1STA & 0xF));  // Wait for Buffer Data available or Errors
         if(!check_for_errors()){
-            package_data[i] = U2RXREG;
+            package_data[i] = U1RXREG;
             i++;
         }
         else{
@@ -59,8 +59,8 @@ uint8_t listen_for_acknowledgement(uint8_t * data_storage){
 void transmit_package(uint8_t * package, int package_len){
     int i = 0;
     while (i < package_len){
-        while(U2STA & (1 << 9));  // Wait until last transmit has finished (TRMT) ( || !(U2STA & (1 << 8))) and transmit buffer is empty (UTXBF)
-        U2TXREG = package[i];  // Set transmit buffer to current package byte
+        while(U1STA & (1 << 9));  // Wait until last transmit has finished (TRMT) ( || !(U1STA & (1 << 8))) and transmit buffer is empty (UTXBF)
+        U1TXREG = package[i];  // Set transmit buffer to current package byte
         i++;
     }
 }
