@@ -8,20 +8,19 @@
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "display_data.h"  /*Declarations of data for display functions*/
 
-/* Declare a helper function which is local to this file */
-static void num32asc(char *s, int);
+static void num32asc( char * s, int );
 
-#define DISPLAY_CHANGE_TO_COMMAND_MODE (PORTDCLR = 0x400)
-#define DISPLAY_CHANGE_TO_DATA_MODE (PORTDSET = 0x400)
+#define DISPLAY_CHANGE_TO_COMMAND_MODE (PORTFCLR = 0x10)
+#define DISPLAY_CHANGE_TO_DATA_MODE (PORTFSET = 0x10)
 
 #define DISPLAY_ACTIVATE_RESET (PORTGCLR = 0x200)
 #define DISPLAY_DO_NOT_RESET (PORTGSET = 0x200)
 
-#define DISPLAY_ACTIVATE_VDD (PORTGCLR = 0x80)
-#define DISPLAY_ACTIVATE_VBAT (PORTDCLR = 0x8)
+#define DISPLAY_ACTIVATE_VDD (PORTFCLR = 0x40)
+#define DISPLAY_ACTIVATE_VBAT (PORTFCLR = 0x20)
 
-#define DISPLAY_TURN_OFF_VDD (PORTGSET = 0x80)
-#define DISPLAY_TURN_OFF_VBAT (PORTDSET = 0x8)
+#define DISPLAY_TURN_OFF_VDD (PORTFSET = 0x40)
+#define DISPLAY_TURN_OFF_VBAT (PORTFSET = 0x20)
 
 /* quicksleep:
    A simple function to create a small delay.
@@ -29,7 +28,7 @@ static void num32asc(char *s, int);
    but very handy in some special cases. */
 void quicksleep(int cyc) {
     int i;
-    for (i = cyc; i > 0; i--);
+    for(i = cyc; i > 0; i--);
 }
 
 /* display_debug
@@ -54,9 +53,9 @@ void display_debug(int slot, volatile int *const addr) {
 }
 
 uint8_t spi_send_recv(uint8_t data) {
-    while (!(SPI2STAT & 0x08));
+    while(!(SPI2STAT & 0x08));
     SPI2BUF = data;
-    while (!(SPI2STAT & 1));
+    while(!(SPI2STAT & 1));
     return SPI2BUF;
 }
 
@@ -90,25 +89,94 @@ void display_init(void) {
     spi_send_recv(0xAF);
 }
 
+void display_setup(void) {
+  /*
+This will set the peripheral bus clock to the same frequency
+as the sysclock. That means 80 MHz, when the microcontroller
+is running at 80 MHz. Changed 2017, as recommended by Axel.
+*/
+  SYSKEY = 0xAA996655;  /* Unlock OSCCON, step 1 */
+  SYSKEY = 0x556699AA;  /* Unlock OSCCON, step 2 */
+  while(OSCCON & (1 << 21)); /* Wait until PBDIV ready */
+  OSCCONCLR = 0x180000; /* clear PBDIV bit <0,1> */
+  while(OSCCON & (1 << 21));  /* Wait until PBDIV ready */
+  SYSKEY = 0x0;  /* Lock OSCCON */
+
+  /* Set up output pins */
+  AD1PCFG = 0xFFFF;
+  ODCE = 0x0;
+  TRISECLR = 0xFF;
+  PORTE = 0x0;
+
+  /* Output pins for display signals */
+  PORTF = 0xFFFF;
+  PORTG = (1 << 9);
+  ODCF = 0x0;
+  ODCG = 0x0;
+  TRISFCLR = 0x70;
+  TRISGCLR = 0x200;
+
+  /* Set up input pins */
+  TRISDSET = (1 << 8);
+  TRISFSET = (1 << 1);
+
+  /* Set up SPI as master */
+  SPI2CON = 0;
+  SPI2BRG = 4;
+  /* SPI2STAT bit SPIROV = 0; */
+  SPI2STATCLR = 0x40;
+  /* SPI2CON bit CKP = 1; */
+  SPI2CONSET = 0x40;
+  /* SPI2CON bit MSTEN = 1; */
+  SPI2CONSET = 0x20;
+  /* SPI2CON bit ON = 1; */
+  SPI2CONSET = 0x8000;
+
+  display_init();
+  display_string(0, "Homesec device");
+  display_string(1, "By RH and LBF");
+  display_string(2, "");
+  display_update();
+}
+
 void display_string(int line, char *s) {
     int i;
-    if (line < 0 || line >= 4)
+    if(line < 0 || line >= 4)
         return;
-    if (!s)
+    if(!s)
         return;
 
-    for (i = 0; i < 16; i++)
-        if (*s) {
+    for(i = 0; i < 16; i++)
+        if(*s) {
             textbuffer[line][i] = *s;
             s++;
         } else
             textbuffer[line][i] = ' ';
 }
 
+void display_image(int x, const uint8_t *data) {
+    int i, j;
+
+    for(i = 0; i < 4; i++) {
+        DISPLAY_CHANGE_TO_COMMAND_MODE;
+
+        spi_send_recv(0x22);
+        spi_send_recv(i);
+
+        spi_send_recv(x & 0xF);
+        spi_send_recv(0x10 | ((x >> 4) & 0xF));
+
+        DISPLAY_CHANGE_TO_DATA_MODE;
+
+        for(j = 0; j < 32; j++)
+            spi_send_recv(~data[i*32 + j]);
+    }
+}
+
 void display_update(void) {
     int i, j, k;
     int c;
-    for (i = 0; i < 4; i++) {
+    for(i = 0; i < 4; i++) {
         DISPLAY_CHANGE_TO_COMMAND_MODE;
         spi_send_recv(0x22);
         spi_send_recv(i);
@@ -118,75 +186,73 @@ void display_update(void) {
 
         DISPLAY_CHANGE_TO_DATA_MODE;
 
-        for (j = 0; j < 16; j++) {
+        for(j = 0; j < 16; j++) {
             c = textbuffer[i][j];
-            if (c & 0x80)
+            if(c & 0x80)
                 continue;
 
-            for (k = 0; k < 8; k++)
-                spi_send_recv(font[c * 8 + k]);
+            for(k = 0; k < 8; k++)
+                spi_send_recv(font[c*8 + k]);
         }
     }
 }
 
-
-void display_setup(void) {
-    /*
-  This will set the peripheral bus clock to the same frequency
-  as the sysclock. That means 80 MHz, when the microcontroller
-  is running at 80 MHz. Changed 2017, as recommended by Axel.
-*/
-    SYSKEY = 0xAA996655;  /* Unlock OSCCON, step 1 */
-    SYSKEY = 0x556699AA;  /* Unlock OSCCON, step 2 */
-    while (OSCCON & (1 << 21)); /* Wait until PBDIV ready */
-    OSCCONCLR = 0x180000; /* clear PBDIV bit <0,1> */
-    while (OSCCON & (1 << 21));  /* Wait until PBDIV ready */
-    SYSKEY = 0x0;  /* Lock OSCCON */
-
-    /* Set up output pins */
-    AD1PCFG = 0xFFFF;
-    ODCE = 0x0;
-    TRISECLR = 0xFF;
-    PORTE = 0x0;
-
-    /* Output pins for display signals */
-    PORTF = 0xFFFF;
-    PORTDSET = 0x408;
-    PORTGSET = 0x280;
-    ODCF = 0x0;
-    ODCG = 0x0;
-    TRISDCLR = 0x408;
-    TRISGCLR = 0x280;
-
-    /* Set up input pins */
-    TRISDSET = (1 << 8);
-    TRISFSET = (1 << 1);
-
-    /* Set up SPI as master */
-    SPI2CON = 0;
-    SPI2BRG = 4;
-    /* SPI2STAT bit SPIROV = 0; */
-    SPI2STATCLR = 0x40;
-    /* SPI2CON bit CKP = 1; */
-    SPI2CONSET = 0x40;
-    /* SPI2CON bit MSTEN = 1; */
-    SPI2CONSET = 0x20;
-    /* SPI2CON bit ON = 1; */
-    SPI2CONSET = 0x8000;
-
-    display_init();
-    display_string(0, "Homesec device");
-    display_string(1, "By RH and LBF");
-    display_string(2, "");
-    display_update();
-}
-
 /* Helper function, local to this file.
    Converts a number to hexadecimal ASCII digits. */
-static void num32asc(char *s, int n) {
+static void num32asc( char * s, int n )
+{
     int i;
-    for (i = 28; i >= 0; i -= 4)
-        *s++ = "0123456789ABCDEF"[(n >> i) & 15];
+    for( i = 28; i >= 0; i -= 4 )
+        *s++ = "0123456789ABCDEF"[ (n >> i) & 15 ];
+}
+
+/*
+ * nextprime
+ *
+ * Return the first prime number larger than the integer
+ * given as a parameter. The integer must be positive.
+ */
+#define PRIME_FALSE   0     /* Constant to help readability. */
+#define PRIME_TRUE    1     /* Constant to help readability. */
+int nextprime( int inval )
+{
+    register int perhapsprime = 0; /* Holds a tentative prime while we check it. */
+    register int testfactor; /* Holds various factors for which we test perhapsprime. */
+    register int found;      /* Flag, false until we find a prime. */
+
+    if (inval < 3 )          /* Initial sanity check of parameter. */
+    {
+        if(inval <= 0) return(1);  /* Return 1 for zero or negative input. */
+        if(inval == 1) return(2);  /* Easy special case. */
+        if(inval == 2) return(3);  /* Easy special case. */
+    }
+    else
+    {
+        /* Testing an even number for primeness is pointless, since
+         * all even numbers are divisible by 2. Therefore, we make sure
+         * that perhapsprime is larger than the parameter, and odd. */
+        perhapsprime = ( inval + 1 ) | 1 ;
+    }
+    /* While prime not found, loop. */
+    for( found = PRIME_FALSE; found != PRIME_TRUE; perhapsprime += 2 )
+    {
+        /* Check factors from 3 up to perhapsprime/2. */
+        for( testfactor = 3; testfactor <= (perhapsprime >> 1) + 1; testfactor += 1 )
+        {
+            found = PRIME_TRUE;      /* Assume we will find a prime. */
+            if( (perhapsprime % testfactor) == 0 ) /* If testfactor divides perhapsprime... */
+            {
+                found = PRIME_FALSE;   /* ...then, perhapsprime was non-prime. */
+                goto check_next_prime; /* Break the inner loop, go test a new perhapsprime. */
+            }
+        }
+      check_next_prime:;         /* This label is used to break the inner loop. */
+        if( found == PRIME_TRUE )  /* If the loop ended normally, we found a prime. */
+        {
+            return( perhapsprime );  /* Return the prime we found. */
+        }
+    }
+    return( perhapsprime );      /* When the loop ends, perhapsprime is a real prime. */
 }
 
 /*
@@ -236,34 +302,36 @@ static void num32asc(char *s, int n) {
  * may not allow this straight away.
  */
 #define ITOA_BUFSIZ ( 24 )
-
-char *itoaconv(int num) {
+char * itoaconv( int num )
+{
     register int i, sign;
-    static char itoa_buffer[ITOA_BUFSIZ];
+    static char itoa_buffer[ ITOA_BUFSIZ ];
     static const char maxneg[] = "-2147483648";
 
-    itoa_buffer[ITOA_BUFSIZ - 1] = 0;   /* Insert the end-of-string marker. */
+    itoa_buffer[ ITOA_BUFSIZ - 1 ] = 0;   /* Insert the end-of-string marker. */
     sign = num;                           /* Save sign. */
-    if (num < 0 && num - 1 > 0)          /* Check for most negative integer */
+    if( num < 0 && num - 1 > 0 )          /* Check for most negative integer */
     {
-        for (i = 0; i < sizeof(maxneg); i += 1)
-            itoa_buffer[i + 1] = maxneg[i];
+        for( i = 0; i < sizeof( maxneg ); i += 1 )
+            itoa_buffer[ i + 1 ] = maxneg[ i ];
         i = 0;
-    } else {
-        if (num < 0) num = -num;           /* Make number positive. */
+    }
+    else
+    {
+        if( num < 0 ) num = -num;           /* Make number positive. */
         i = ITOA_BUFSIZ - 2;                /* Location for first ASCII digit. */
         do {
-            itoa_buffer[i] = num % 10 + '0';/* Insert next digit. */
+            itoa_buffer[ i ] = num % 10 + '0';/* Insert next digit. */
             num = num / 10;                   /* Remove digit from number. */
             i -= 1;                           /* Move index to next empty position. */
-        } while (num > 0);
-        if (sign < 0) {
-            itoa_buffer[i] = '-';
+        } while( num > 0 );
+        if( sign < 0 )
+        {
+            itoa_buffer[ i ] = '-';
             i -= 1;
         }
     }
     /* Since the loop always sets the index i to the next empty position,
      * we must add 1 in order to return a pointer to the first occupied position. */
-    return (&itoa_buffer[i + 1]);
+    return( &itoa_buffer[ i + 1 ] );
 }
-
