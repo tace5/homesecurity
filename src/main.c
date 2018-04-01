@@ -19,7 +19,7 @@
 #include "network/ip.h"
 #include "network/udp.h"
 #include "network/http.h"
-#include "controllers/flow_control.h"
+#include "state_machine/state_main.h"
 
 void user_isr() {
     display_string(1, "Inside ISR");
@@ -47,9 +47,7 @@ int main(void) {
     sensor_init();
     fingerprint_main();
 
-    while (1) {
-        do_work();
-    }
+    state_main();
 
     return 0;
 }
