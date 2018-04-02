@@ -44,8 +44,6 @@ int main(void) {
     demo_setup();
     _enable_interrupt();
     display_setup();
-    sensor_init();
-    fingerprint_main();
 
     state_main();
 

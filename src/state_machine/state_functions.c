@@ -4,29 +4,97 @@
 
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
+#include "../drivers/display/display_functions.h"
 #include "state_functions.h"
 
-void *led1_on(){
-    //Turn on led1
-    PORTESET = 0x4;
-    return led1_off;
+void *boot(){
+    //If config is already set by talking to fingerprint sensor.
+    return wait_to_arm;
+
+    //Else
+    return wait_for_api;
 }
 
-void *led1_off(){
-    //Turn off led1
-    PORTECLR = 0x4;
-    return led2_on;
+void *wait_for_api(){
+    //Enable raspberry (I2C) interrupt
+
+    //Wait for interrupt
+
+    //Check for flag that interrupt sets
+
+    //If set
+    //Disable raspberry (I2C) interrupt
+    return config_mode;
 }
 
-
-void *led2_on(){
-    //Turn on led2
-    PORTESET = 0x8;
-    return led2_off;
+void *config_mode(){
+    //Register fingerprint
 }
 
-void *led2_off(){
-    //Turn off led2
-    PORTECLR = 0x8;
-    return led1_on;
+void *wait_to_arm(){
+    //Enable raspberry (I2C) interrupt
+    //Enable fingerprint (UART) interrupt
+
+    //Wait for either interrupt flag to be set
+
+    //Disable interrupts
+
+    //If interrupt flag set for fingerprint (UART)
+    return arming;
+
+    //If interrupt flag set for raspberry (I2C)
+    return config_mode;
+}
+
+void *arming(){
+    //Authenticate user with fingerprint
+
+    //If successful
+    return armed;
+
+    //If unsuccessful
+    return wait_to_arm;
+}
+
+void *armed(){
+    //Enable fingerprint (UART) interrupt
+    //Enable US sensor interrupt
+
+    //Wait for interrupt
+
+    //Disable interrupts
+
+    //If interrupt flag set for US sensor
+    return alarm_triggered;
+
+    //If interrupt flag set for fingerprint (UART)
+    return disarming;
+}
+
+void *disarming(){
+    //Authenticate users fingerprint
+
+    //If successful
+    //Send disarmed message to users phone
+    return wait_to_arm;
+
+    //If unsuccessful
+
+    //If alarm has been triggered
+    //Send failed try message to users phone
+    return alarm_triggered;
+
+    //If alarm hasn't been triggered
+    return armed;
+}
+
+void *alarm_triggered(){
+    //Send alarm triggered message to users phone
+    //Visual feedback
+    //Enable fingerprint (UART) interrupt
+
+    //Wait for fingerprint interrupt
+
+    //If interrupt flag set for fingerprint (UART)
+    return disarming;
 }
