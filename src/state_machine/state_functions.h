@@ -7,11 +7,22 @@
 
 typedef void *(*StateFunc)();
 
-void *led1_on();
-void *led1_off();
+void *boot();
 
-void *led2_on();
-void *led2_off();
+void *wait_for_api();
+
+void *config_mode();
+
+void *wait_to_arm();
+
+void *arming();
+
+void *armed();
+
+void *disarming();
+
+void *alarm_triggered();
+
 
 #include "state_functions.c"
 
