@@ -5,7 +5,7 @@
 #ifndef HOMESECURITY_STATE_MAIN_H
 #define HOMESECURITY_STATE_MAIN_H
 
-void state_main();
+void start_state_machine();
 
 #include "state_main.c"
 

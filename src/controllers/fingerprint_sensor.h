@@ -25,7 +25,7 @@ void enable_fingerprint_interrupts(void);
 
 void disable_fingerprint_interrupts(void);
 
-void handle_interrupt();
+void handle_finger_interrupt();
 
 
 // CONTROLLER FUNCTIONS

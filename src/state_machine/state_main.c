@@ -10,7 +10,7 @@
 #include "state_functions.h"
 #include "../utils/utils.h"
 
-void state_main(){
+void start_state_machine(){
     StateFunc statefunc = boot;
 
     while (1){
