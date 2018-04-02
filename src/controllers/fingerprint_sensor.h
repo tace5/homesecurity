@@ -21,9 +21,9 @@ char check_for_stored_print();
 
 int get_total_package_length(int data_length);
 
-void enable_fingerprint_interrupts(void);
+void enable_fingerprint_interrupt(void);
 
-void disable_fingerprint_interrupts(void);
+void disable_fingerprint_interrupt(void);
 
 void handle_finger_interrupt();
 

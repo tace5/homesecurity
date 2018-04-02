@@ -5,58 +5,87 @@
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "../drivers/display/display_functions.h"
+#include "../controllers/fingerprint_sensor.h"
 #include "state_functions.h"
+#include "../globals.h"
 
 void *boot(){
+    display_string(2, "Boot state");
+    display_update();
     //If config is already set by talking to fingerprint sensor.
-    return wait_to_arm;
-
-    //Else
-    return wait_for_api;
+    char status = check_for_stored_print();
+    if (status == 0x1) {
+        return wait_to_arm;
+    }else {
+        return wait_for_api;
+    }
 }
 
 void *wait_for_api(){
-    //Enable raspberry (I2C) interrupt
+    display_string(2, "Waiting API");
+    display_update();
+    //Enable config (I2C) interrupt
 
     //Wait for interrupt
 
     //Check for flag that interrupt sets
 
     //If set
-    //Disable raspberry (I2C) interrupt
-    return config_mode;
+    //Disable config (I2C) interrupt
+    //return config_mode;
 }
 
 void *config_mode(){
+    display_string(2, "Conf mode");
+    display_update();
     //Register fingerprint
+
+    //return wait_to_arm;
 }
 
 void *wait_to_arm(){
-    //Enable raspberry (I2C) interrupt
+    display_string(2, "Waiting arm");
+    display_update();
+    //Enable config (I2C) interrupt
     //Enable fingerprint (UART) interrupt
+    enable_fingerprint_interrupt();
 
-    //Wait for either interrupt flag to be set
+    //Check if either interrupt flag has been set
+    if(FINGERPRINT_FLAG == 0x1 || CONF_FLAG == 0x1) {
+        display_string(3, "In if");
+        display_update();
+        //Disable interrupts
+        disable_fingerprint_interrupt();
 
-    //Disable interrupts
+        //If interrupt flag set for fingerprint (UART)
+        if(FINGERPRINT_FLAG){
+            FINGERPRINT_FLAG = 0x0;
+            return arming;
+        }//If interrupt flag set for config (I2C)
+        else if(CONF_FLAG){
+            CONF_FLAG = 0x0;
+            return config_mode;
+        }
+    }
 
-    //If interrupt flag set for fingerprint (UART)
-    return arming;
-
-    //If interrupt flag set for raspberry (I2C)
-    return config_mode;
-}
-
-void *arming(){
-    //Authenticate user with fingerprint
-
-    //If successful
-    return armed;
-
-    //If unsuccessful
     return wait_to_arm;
 }
 
+void *arming(){
+    display_string(2, "Arming");
+    display_update();
+    //Authenticate user with fingerprint
+
+    //If successful
+    //return armed;
+
+    //If unsuccessful
+    //return wait_to_arm;
+}
+
 void *armed(){
+    display_string(2, "Armed!");
+    display_update();
     //Enable fingerprint (UART) interrupt
     //Enable US sensor interrupt
 
@@ -65,30 +94,34 @@ void *armed(){
     //Disable interrupts
 
     //If interrupt flag set for US sensor
-    return alarm_triggered;
+    //return alarm_triggered;
 
     //If interrupt flag set for fingerprint (UART)
-    return disarming;
+    //return disarming;
 }
 
 void *disarming(){
+    display_string(2, "Disarming");
+    display_update();
     //Authenticate users fingerprint
 
     //If successful
     //Send disarmed message to users phone
-    return wait_to_arm;
+    //return wait_to_arm;
 
     //If unsuccessful
 
     //If alarm has been triggered
     //Send failed try message to users phone
-    return alarm_triggered;
+    //return alarm_triggered;
 
     //If alarm hasn't been triggered
-    return armed;
+    //return armed;
 }
 
 void *alarm_triggered(){
+    display_string(2, "ALARM!!!");
+    display_update();
     //Send alarm triggered message to users phone
     //Visual feedback
     //Enable fingerprint (UART) interrupt
@@ -96,5 +129,5 @@ void *alarm_triggered(){
     //Wait for fingerprint interrupt
 
     //If interrupt flag set for fingerprint (UART)
-    return disarming;
+    //return disarming;
 }

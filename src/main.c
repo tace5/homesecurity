@@ -22,30 +22,17 @@
 #include "state_machine/state_main.h"
 
 void user_isr() {
-    display_string(1, "Inside ISR");
-    display_update();
-    _delay(1500);
     if ((IFS(0) & FINGER_TOUCH_INT) >> 11) {
-        handle_interrupt();
+        handle_finger_interrupt();
     }
 }
 
-void demo_setup() {
-    //Enable switch SW2 & SW3 for demo, routed from port 7 & 8 to port 29 & 30
-    //TRISESET = 0x18;
-    //CURRENT_STATE = CONFIG_MODE;
-}
-
-void do_work() {
-    main_flow();
-}
-
 int main(void) {
-    demo_setup();
     _enable_interrupt();
     display_setup();
+    fingerprint_main();
 
-    state_main();
+    start_state_machine();
 
     return 0;
 }

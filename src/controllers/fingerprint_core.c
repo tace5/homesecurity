@@ -9,6 +9,7 @@
 #include "../drivers/display/display_functions.h"
 #include "../utils/utils.h"
 #include "../state.h"
+#include "../globals.h"
 
 
 int check_for_errors(){
@@ -66,4 +67,5 @@ void disable_fingerprint_interrupt(){
 
 void handle_finger_interrupt(){
     //TODO - Set flag to signal state machine to move on.
+    FINGERPRINT_FLAG = 0x1;
 }

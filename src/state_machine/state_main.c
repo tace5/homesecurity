@@ -11,10 +11,13 @@
 #include "../utils/utils.h"
 
 void start_state_machine(){
-    StateFunc statefunc = boot;
+    StateFunc current_state = boot;
 
     while (1){
-        statefunc = (StateFunc)(*statefunc)();
+        current_state = (StateFunc)(*current_state)();
         _delay(1000);
     }
+
+    display_string(3, "Out of loop");
+    display_update();
 }
