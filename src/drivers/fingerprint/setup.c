@@ -23,12 +23,10 @@ void config_uart() {  // Using UART1 on PIN 0 (RX) and PIN 1 (TX)
 void setup() {
     TRISESET = 0x1;  // Set port connected to Sout to input (PIN 26) and port connected to Vtouch to output (PIN 27)
     config_uart();
-    register_interrupts();
-    force_handshake();
-}
+    uint8_t status = force_handshake();
 
-void register_interrupts() {
-    INTCONSET = 0x4;
-    IECSET(0) = FINGER_TOUCH_INT;      // Enable INT2 interrupt
-    IPCSET(2) = 0x1F000000; // Set priority = 7 and sub = 3
+    if(status != 0x55){
+        display_string(3, "HANDSHAKE FAIL");
+        display_update();
+    }
 }

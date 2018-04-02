@@ -53,61 +53,17 @@ int get_total_package_length(int data_length){
     return (2 + 4 + 1 + 2 + data_length + 2);
 }
 
+void enable_fingerprint_interrupt(){
+    INTCONSET = 0x4;
+    IECSET(0) = FINGER_TOUCH_INT;      // Enable INT2 interrupt
+    IPCSET(2) = 0x1F000000; // Set priority = 7 and sub = 3
+}
+
+void disable_fingerprint_interrupt(){
+    INTCONCLR = 0x4;
+    IECCLR(0) = FINGER_TOUCH_INT;      // Disable INT2 interrupt
+}
+
 void handle_interrupt(){
-    uint8_t state = CURRENT_STATE;
 
-    switch(state) {
-        // Case: State = Default
-        case DEFAULT_STATE:
-            display_string(0, "Arming alarm");
-            display_update();
-            arm_alarm();
-            break;
-
-        // Case: State = Scan next finger to complete config
-        case SCAN_NEXT:
-            display_string(0, "Scan 2nd print");
-            display_update();
-            enroll_print_2nd();
-            break;
-
-        // Case: State = Config mode
-        case CONFIG_MODE:
-            display_string(0, "Adding new print");
-            display_update();
-            enroll_print_1st();
-            break;
-
-        // Case: State = Alarm is armed but not triggered
-        case ALARM_ARMED:
-            display_string(0, "Deactivating");
-            display_update();
-            authenticate();
-            break;
-
-        // Case: State = Alarm is triggered
-        case ALARM_TRIGGERED:
-            display_string(0, "Deactivating");
-            display_update();
-            authenticate();
-            break;
-
-        // Case: State = Something has gone wrong, restart is maybe a solution
-        case ERROR_STATE:
-            display_string(0, "An error has");
-            display_string(1, "Occurred");
-            display_string(2, "Restart");
-            display_update();
-            break;
-        default:
-            display_string(0, "An error has");
-            display_string(1, "Occurred");
-            display_string(2, "Restart");
-            display_update();
-            break;
-    }
-
-    IFSCLR(0) = FINGER_TOUCH_INT;
-
-    _delay(500);
 }
