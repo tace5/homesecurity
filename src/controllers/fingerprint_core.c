@@ -65,7 +65,12 @@ void disable_fingerprint_interrupt(){
     IECCLR(0) = FINGER_TOUCH_INT;      // Disable INT2 interrupt
 }
 
+void reset_fingerprint_interrupt(){
+    IFSCLR(0) = FINGER_TOUCH_INT;
+}
+
 void handle_finger_interrupt(){
     //TODO - Set flag to signal state machine to move on.
+    reset_fingerprint_interrupt();
     FINGERPRINT_FLAG = 0x1;
 }

@@ -11,8 +11,7 @@
 #include "../utils/utils.h"
 
 void start_state_machine(){
-    StateFunc current_state = boot;
-
+    volatile StateFunc current_state = boot;
     while (1){
         current_state = (StateFunc)(*current_state)();
         _delay(1000);

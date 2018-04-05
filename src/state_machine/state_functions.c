@@ -52,8 +52,6 @@ void *wait_to_arm(){
 
     //Check if either interrupt flag has been set
     if(FINGERPRINT_FLAG == 0x1 || CONF_FLAG == 0x1) {
-        display_string(3, "In if");
-        display_update();
         //Disable interrupts
         disable_fingerprint_interrupt();
 
