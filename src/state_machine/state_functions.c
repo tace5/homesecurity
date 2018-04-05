@@ -10,8 +10,6 @@
 #include "../globals.h"
 
 void *boot(){
-    display_string(2, "Boot state");
-    display_update();
     //If config is already set by talking to fingerprint sensor.
     char status = check_for_stored_print();
     if (status == 0x1) {
@@ -22,7 +20,8 @@ void *boot(){
 }
 
 void *wait_for_api(){
-    display_string(2, "Waiting API");
+    display_string(0, "Waiting for");
+    display_string(1, "API");
     display_update();
     //Enable config (I2C) interrupt
 
@@ -36,15 +35,17 @@ void *wait_for_api(){
 }
 
 void *config_mode(){
-    display_string(2, "Conf mode");
+    display_string(0, "Configuration");
+    display_string(1, "mode");
     display_update();
     //Register fingerprint
 
-    //return wait_to_arm;
+    return wait_to_arm;
 }
 
 void *wait_to_arm(){
-    display_string(2, "Waiting arm");
+    display_string(0, "Waiting to");
+    display_string(1, "arm device");
     display_update();
     //Enable config (I2C) interrupt
     //Enable fingerprint (UART) interrupt
@@ -58,10 +59,16 @@ void *wait_to_arm(){
         //If interrupt flag set for fingerprint (UART)
         if(FINGERPRINT_FLAG){
             FINGERPRINT_FLAG = 0x0;
+            display_string(2, "Keep finger");
+            display_string(3, "on sensor!");
+            display_update();
             return arming;
         }//If interrupt flag set for config (I2C)
         else if(CONF_FLAG){
             CONF_FLAG = 0x0;
+            display_string(2, "Keep finger");
+            display_string(3, "on sensor!");
+            display_update();
             return config_mode;
         }
     }
@@ -70,7 +77,8 @@ void *wait_to_arm(){
 }
 
 void *arming(){
-    display_string(2, "Arming");
+    display_string(0, "Arming");
+    display_string(1, "Device");
     display_update();
     //Authenticate user with fingerprint
 
@@ -82,7 +90,8 @@ void *arming(){
 }
 
 void *armed(){
-    display_string(2, "Armed!");
+    display_string(0, "DEVICE IS");
+    display_string(1, "ARMED!!!");
     display_update();
     //Enable fingerprint (UART) interrupt
     //Enable US sensor interrupt
@@ -99,7 +108,8 @@ void *armed(){
 }
 
 void *disarming(){
-    display_string(2, "Disarming");
+    display_string(0, "Disarming");
+    display_string(1, "device...");
     display_update();
     //Authenticate users fingerprint
 
@@ -118,6 +128,8 @@ void *disarming(){
 }
 
 void *alarm_triggered(){
+    display_string(0, "ALARM!!!");
+    display_string(1, "ALARM!!!");
     display_string(2, "ALARM!!!");
     display_update();
     //Send alarm triggered message to users phone
