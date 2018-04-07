@@ -42,4 +42,20 @@ void display_setup(void);
 
 #include "display_functions.c"
 
+//Default messages
+
+void user_message(char * message, int len);
+
+void state_message(char * message, int len);
+
+void msg_request_err();
+
+void msg_finger_on_sensor(char put_or_keep);
+
+void msg_remove_finger();
+
+void msg_try_again();
+
+#include "display_default_messages.c"
+
 #endif //HOMESECURITY_DISPLAY_FUNCTIONS_H

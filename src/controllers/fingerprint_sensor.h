@@ -30,17 +30,19 @@ void handle_finger_interrupt();
 
 // CONTROLLER FUNCTIONS
 
-void enroll_print_1st();
+uint8_t enroll_print_1st();
 
-void enroll_print_2nd();
+uint8_t enroll_print_2nd();
+
+uint8_t enroll_finger();
 
 uint8_t auth_chain(uint8_t * match_score);
 
-void authenticate();
+uint8_t authenticate();
 
-void arm_alarm();
+uint8_t arm_alarm();
 
-void disarm();
+uint8_t disarm();
 
 #include "fingerprint_core.c"
 #include "fingerprint_sensor.c"

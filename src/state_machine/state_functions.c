@@ -20,9 +20,7 @@ void *boot(){
 }
 
 void *wait_for_api(){
-    display_string(0, "Waiting for");
-    display_string(1, "API");
-    display_update();
+    state_message("Waiting for API", 15);
     //Enable config (I2C) interrupt
 
     //Wait for interrupt
@@ -35,18 +33,14 @@ void *wait_for_api(){
 }
 
 void *config_mode(){
-    display_string(0, "Configuration");
-    display_string(1, "mode");
-    display_update();
+    state_message("Configuration   Mode", 20);
     //Register fingerprint
 
     return wait_to_arm;
 }
 
 void *wait_to_arm(){
-    display_string(0, "Waiting to");
-    display_string(1, "arm device");
-    display_update();
+    state_message("Waiting to      arm device", 26);
     //Enable config (I2C) interrupt
     //Enable fingerprint (UART) interrupt
     enable_fingerprint_interrupt();
@@ -56,19 +50,15 @@ void *wait_to_arm(){
         //Disable interrupts
         disable_fingerprint_interrupt();
 
+        msg_finger_on_sensor(0x0);
+
         //If interrupt flag set for fingerprint (UART)
         if(FINGERPRINT_FLAG){
             FINGERPRINT_FLAG = 0x0;
-            display_string(2, "Keep finger");
-            display_string(3, "on sensor!");
-            display_update();
             return arming;
         }//If interrupt flag set for config (I2C)
         else if(CONF_FLAG){
             CONF_FLAG = 0x0;
-            display_string(2, "Keep finger");
-            display_string(3, "on sensor!");
-            display_update();
             return config_mode;
         }
     }
@@ -77,12 +67,12 @@ void *wait_to_arm(){
 }
 
 void *arming(){
-    display_string(0, "Arming");
-    display_string(1, "Device");
-    display_update();
+    state_message("Arming device...", 16);
     //Authenticate user with fingerprint
-
+    uint8_t success = authenticate();
     //If successful
+    user_message("Alarm will arm  in 10 sec!", 26);
+    _delay(10000);
     //return armed;
 
     //If unsuccessful
@@ -90,9 +80,7 @@ void *arming(){
 }
 
 void *armed(){
-    display_string(0, "DEVICE IS");
-    display_string(1, "ARMED!!!");
-    display_update();
+    state_message("DEVICE IS       ARMED!!!", 24);
     //Enable fingerprint (UART) interrupt
     //Enable US sensor interrupt
 
@@ -108,13 +96,12 @@ void *armed(){
 }
 
 void *disarming(){
-    display_string(0, "Disarming");
-    display_string(1, "device...");
-    display_update();
+    state_message("Disarming...", 12);
     //Authenticate users fingerprint
 
     //If successful
     //Send disarmed message to users phone
+    //Disarm US
     //return wait_to_arm;
 
     //If unsuccessful
