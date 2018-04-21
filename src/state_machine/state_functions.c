@@ -36,7 +36,17 @@ void *config_mode(){
     state_message("Configuration   Mode", 20);
     //Register fingerprint
 
-    return wait_to_arm;
+    uint8_t enrolled = enroll_finger();
+
+    if(enrolled){
+        user_message("Success!!!", 10);
+        _delay(500);
+        return wait_to_arm;
+    } else{
+        user_message("Failed!!!       Try again", 25);
+        _delay(1000);
+        return config_mode;
+    }
 }
 
 void *wait_to_arm(){
@@ -71,12 +81,18 @@ void *arming(){
     //Authenticate user with fingerprint
     uint8_t success = authenticate();
     //If successful
-    user_message("Alarm will arm  in 10 sec!", 26);
-    _delay(10000);
-    //return armed;
-
-    //If unsuccessful
-    //return wait_to_arm;
+    if(success == 0x1){
+        user_message("Alarm will arm  in 10 sec!", 26);
+        _delay(10000);
+        return armed;
+    } //If fingers dont match
+    else if(success == 0x2){
+        user_message("Prints don't    match!!!", 24);
+        return wait_to_arm;
+    } //If request fail
+    else{
+        return wait_to_arm;
+    }
 }
 
 void *armed(){
