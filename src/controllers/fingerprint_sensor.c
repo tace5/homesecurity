@@ -97,7 +97,7 @@ uint8_t enroll_print_2nd(){
 
         uint8_t res_model = generate_print_model();
         if(res_model == RES_COMBINE_FAIL){
-            user_message("Not the same    Finger, redo");
+            user_message("Not the same    Finger, redo", 28);
             return 0x2;
         } else if(res_model == RES_RECEIVE_FAIL){
             msg_request_err();
