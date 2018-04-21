@@ -5,6 +5,8 @@
 // But modified to handle device states.
 //
 
+#include <stdint.h>   /* Declarations of uint_32 and the like */
+#include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "../drivers/display/display_functions.h"
 #include "state_main.h"
 #include "state_functions.h"
@@ -13,6 +15,9 @@
 void start_state_machine(){
     volatile StateFunc current_state = boot;
     while (1){
+        if(PORTD & 0x80){
+            current_state = config_mode;
+        }
         current_state = (StateFunc)(*current_state)();
         _delay(1000);
     }
