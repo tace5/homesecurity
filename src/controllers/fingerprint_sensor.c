@@ -93,27 +93,19 @@ uint8_t enroll_print_2nd(){
         return 0x0;
     } else {
 
-        display_string(2, "Making model");
-        display_string(3, "...");
-        display_update();
+        user_message("Making model...", 15);
 
         uint8_t res_model = generate_print_model();
         if(res_model == RES_COMBINE_FAIL){
-            display_string(2, "Not the same");
-            display_string(3, "Finger, redo");
-            display_update();
+            user_message("Not the same    Finger, redo");
             return 0x2;
         } else if(res_model == RES_RECEIVE_FAIL){
-            display_string(2, "Request error");
-            display_string(3, "");
-            display_update();
+            msg_request_err();
             return 0x0;
         }else {
             uint8_t res_store = save_print_to_flash(CHAR_BUFFER_1);
 
-            display_string(2, "Model created");
-            display_string(3, "and stored!");
-            display_update();
+            user_message("Model created   and stored!", 27);
 
             _delay(500);
         }
@@ -124,13 +116,7 @@ uint8_t enroll_print_2nd(){
 
 
 uint8_t enroll_finger(){
-    if (PORTD & 0x200){
-        display_string(2, "Keep finger");
-    } else{
-        display_string(2, "Put finger");
-    }
-    display_string(3, "on sensor!");
-    display_update();
+    msg_finger_on_sensor((char) ~(PORTD & 0x200));
 
     _delay(500);
 
@@ -197,7 +183,6 @@ uint8_t authenticate(){
         msg_request_err();
         return 0x0;
     }
-
 }
 
 uint8_t arm_alarm(){
