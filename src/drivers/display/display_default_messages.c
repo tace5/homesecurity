@@ -27,6 +27,12 @@ void user_message(char * message, int len){
     display_update();
 }
 
+void clr_user_message(){
+    display_string(2, "");
+    display_string(3, "");
+    display_update();
+}
+
 void state_message(char * message, int len){
     if(len < 17){
         display_string(0, message);
@@ -46,6 +52,12 @@ void state_message(char * message, int len){
         display_string(1, mes2);
     }
 
+    display_update();
+}
+
+void clr_state_message(){
+    display_string(0, "");
+    display_string(1, "");
     display_update();
 }
 
