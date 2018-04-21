@@ -8,6 +8,7 @@
 #include "../../utils/utils.h"
 #include "../../controllers/fingerprint_sensor.h"
 #include "commands.h"
+#include "../../globals.h"
 
 void init() {
     _delay(1000);  // Sleep for 1s to let sensor startup
@@ -29,4 +30,6 @@ void setup() {
         display_string(3, "HANDSHAKE FAIL");
         display_update();
     }
+
+    FINGERPRINT_FLAG = 0x0;
 }
