@@ -78,8 +78,15 @@ void *wait_to_arm(){
 
 void *arming(){
     state_message("Arming device...", 16);
+    //Enable interrupts (maybe not needed)
+    enable_fingerprint_interrupt();
     //Authenticate user with fingerprint
     uint8_t success = authenticate();
+
+    //Reset interrupt flag and disable interrupt
+    FINGERPRINT_FLAG = 0x0;
+    disable_fingerprint_interrupt();
+
     //If successful
     if(success == 0x1){
         user_message("Alarm will arm  in 10 sec!", 26);
@@ -97,6 +104,7 @@ void *arming(){
 
 void *armed(){
     state_message("DEVICE IS       ARMED!!!", 24);
+    clr_user_message();
     //Enable fingerprint (UART) interrupt
     //Enable US sensor interrupt
 
@@ -109,6 +117,7 @@ void *armed(){
 
     //If interrupt flag set for fingerprint (UART)
     //return disarming;
+    return armed;
 }
 
 void *disarming(){
