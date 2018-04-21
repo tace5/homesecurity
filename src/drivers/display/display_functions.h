@@ -46,7 +46,11 @@ void display_setup(void);
 
 void user_message(char * message, int len);
 
+void clr_user_message();
+
 void state_message(char * message, int len);
+
+void clr_state_message();
 
 void msg_request_err();
 
