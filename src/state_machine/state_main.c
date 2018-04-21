@@ -11,12 +11,13 @@
 #include "state_main.h"
 #include "state_functions.h"
 #include "../utils/utils.h"
+#include "../globals.h"
 
 void start_state_machine(){
     volatile StateFunc current_state = boot;
     while (1){
         if(PORTD & 0x80){
-            current_state = config_mode;
+            CONF_FLAG = 0x1;
         }
         current_state = (StateFunc)(*current_state)();
         _delay(1000);
