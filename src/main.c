@@ -30,7 +30,11 @@ void user_isr() {
 int main(void) {
     _enable_interrupt();
     display_setup();
+    sensor_init();
     fingerprint_main();
+
+    display_string(3, "Booted");
+    display_update();
 
     start_state_machine();
 

@@ -11,7 +11,7 @@
 #include "../../globals.h"
 
 void init() {
-    _delay(1000);  // Sleep for 1s to let sensor startup
+    _delay(5000);  // Sleep for 1s to let sensor startup
 }
 
 void config_uart() {  // Using UART1 on PIN 0 (RX) and PIN 1 (TX)
