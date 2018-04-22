@@ -20,23 +20,23 @@
 #include "network/udp.h"
 #include "network/http.h"
 #include "state_machine/state_main.h"
-#include "drivers/summer/summer.h"
 
 void user_isr() {
     if ((IFS(0) & FINGER_TOUCH_INT) >> 11) {
         handle_finger_interrupt();
-    } else if (IFS(0) & 0x100) {
-        summer_isr();
     }
 }
 
 int main(void) {
     _enable_interrupt();
     display_setup();
+    sensor_init();
+    fingerprint_main();
 
-    summer_trig();
-    _delay(5000);
-    summer_stop();
+    display_string(3, "Booted");
+    display_update();
 
-    while(1); // Never return
+    start_state_machine();
+
+    return 0;
 }
