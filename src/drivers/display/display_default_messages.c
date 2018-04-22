@@ -8,7 +8,7 @@
 void user_message(char * message, int len){
     if(len < 17){
         display_string(2, message);
-        display_string(3, "");
+        display_string(3, "                ");
     } else{
         int i;
         int j;
@@ -28,15 +28,15 @@ void user_message(char * message, int len){
 }
 
 void clr_user_message(){
-    display_string(2, "");
-    display_string(3, "");
+    display_string(2, "                ");
+    display_string(3, "                ");
     display_update();
 }
 
 void state_message(char * message, int len){
     if(len < 17){
         display_string(0, message);
-        display_string(1, "");
+        display_string(1, "                ");
     } else{
         int i;
         int j;
@@ -56,8 +56,8 @@ void state_message(char * message, int len){
 }
 
 void clr_state_message(){
-    display_string(0, "");
-    display_string(1, "");
+    display_string(0, "                ");
+    display_string(1, "                ");
     display_update();
 }
 

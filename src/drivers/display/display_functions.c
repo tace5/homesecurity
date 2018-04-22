@@ -136,6 +136,7 @@ is running at 80 MHz. Changed 2017, as recommended by Axel.
   display_string(0, "Homesec device");
   display_string(1, "By RH and LBF");
   display_string(2, "");
+  display_string(3, "Booting...");
   display_update();
 }
 
