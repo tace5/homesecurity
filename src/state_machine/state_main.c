@@ -14,15 +14,21 @@
 #include "../globals.h"
 #include "../controllers/us_sensor.h"
 
+uint8_t FINGERPRINT_FLAG = 0x0;
+uint8_t CONF_FLAG = 0x0;
+uint8_t US_ACTIVE = 0x0;
+uint8_t US_FLAG = 0x0;
+uint8_t ALARM_FLAG = 0x0;
+
 void start_state_machine(){
     volatile StateFunc current_state = boot;
     while (1){
         if(PORTD & 0x80){
-            CONF_FLAG = 0x1;
+            set_conf_flag(1);
         }
-        if(US_ACTIVE){
+        if(get_us_active_flag()){
             if((int) check_trigger()){
-                US_FLAG = 0x1;
+                set_us_flag(1);
             }
         }
         current_state = (StateFunc)(*current_state)();
@@ -31,4 +37,45 @@ void start_state_machine(){
 
     display_string(3, "Out of loop");
     display_update();
+}
+
+
+void set_finger_flag(uint8_t status){
+    FINGERPRINT_FLAG = status;
+}
+
+void set_us_flag(uint8_t status){
+    US_FLAG = status;
+}
+
+void set_us_active_flag(uint8_t status){
+    US_ACTIVE = status;
+}
+
+void set_conf_flag(uint8_t status){
+    CONF_FLAG = status;
+}
+
+void set_alarm_flag(uint8_t status){
+    ALARM_FLAG = status;
+}
+
+uint8_t get_finger_flag(){
+    return FINGERPRINT_FLAG;
+}
+
+uint8_t  get_us_flag(){
+    return US_FLAG;
+}
+
+uint8_t  get_us_active_flag(){
+    return US_ACTIVE;
+}
+
+uint8_t  get_conf_flag(){
+    return CONF_FLAG;
+}
+
+uint8_t  get_alarm_flag(){
+    return ALARM_FLAG;
 }

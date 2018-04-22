@@ -6,8 +6,6 @@
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "us_sensor.h"
 #include "../drivers/us_sensor/us_sensor.h"
-#include "flow_control.h"
-#include "../state.h"
 #include "fingerprint_sensor.h"
 
 void arm_us(){

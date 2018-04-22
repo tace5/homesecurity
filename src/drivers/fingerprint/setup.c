@@ -8,7 +8,7 @@
 #include "../../utils/utils.h"
 #include "../../controllers/fingerprint_sensor.h"
 #include "commands.h"
-#include "../../globals.h"
+#include "../../state_machine/state_main.h"
 
 void init() {
     _delay(5000);  // Sleep for 1s to let sensor startup
@@ -31,5 +31,5 @@ void setup() {
         display_update();
     }
 
-    FINGERPRINT_FLAG = 0x0;
+    set_finger_flag(0);
 }

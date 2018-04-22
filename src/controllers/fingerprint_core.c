@@ -8,8 +8,8 @@
 #include "../drivers/fingerprint/commands.h"
 #include "../drivers/display/display_functions.h"
 #include "../utils/utils.h"
-#include "../state.h"
 #include "../globals.h"
+#include "../state_machine/state_main.h"
 
 
 int check_for_errors(){
@@ -70,7 +70,6 @@ void reset_fingerprint_interrupt(){
 }
 
 void handle_finger_interrupt(){
-    //TODO - Set flag to signal state machine to move on.
     reset_fingerprint_interrupt();
-    FINGERPRINT_FLAG = 0x1;
+    set_finger_flag(1);
 }

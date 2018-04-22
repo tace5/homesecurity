@@ -9,7 +9,6 @@
 #include "fingerprint_sensor.h"
 #include "../drivers/display/display_functions.h"
 #include "../utils/utils.h"
-#include "../state.h"
 #include "us_sensor.h"
 
 
@@ -25,12 +24,15 @@ char scan_finger(uint8_t buffer_id){
     }
 
     if(success == 0x1) {
+        user_message("1st", 3);
         uint8_t res_to_buffer;
         do {
+            user_message("2nd", 3);
             uint8_t res_scan;
             do {
+                user_message("3rd", 3);
                 res_scan = scan_print();
-
+                user_message("4th", 3);
                 if (res_scan == RES_NO_FINGER) {
                     user_message("No finger", 9);
                 } else if (res_scan == RES_ENROLLMENT_FAIL) {
@@ -158,10 +160,10 @@ uint8_t auth_chain(uint8_t *match_score){
 
         user_message("Authenticating", 14);
 
-        _delay(2500);
-
         uint8_t res_load = load_print_from_flash(CHAR_BUFFER_2);
         res_match = match_buffers(match_score);
+
+        user_message("Auth done", 9);
     }
 
     return res_match;

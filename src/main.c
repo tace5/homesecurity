@@ -4,7 +4,6 @@
 //#include "drivers/ethernet/enc28j60_instructions.h"
 //#include "drivers/ethernet/enc28j60_control_registers.h"
 #include "utils/utils.h"
-#include "state.h"
 #include "drivers/display/display_functions.h"
 #include "drivers/fingerprint/fingerprint.h"
 #include "controllers/fingerprint_sensor.h"
@@ -20,10 +19,14 @@
 #include "network/udp.h"
 #include "network/http.h"
 #include "state_machine/state_main.h"
+#include "drivers/summer/summer.h"
 
 void user_isr() {
     if ((IFS(0) & FINGER_TOUCH_INT) >> 11) {
         handle_finger_interrupt();
+    }
+    if(IFS(0) & 0x100){
+        summer_isr();
     }
 }
 
