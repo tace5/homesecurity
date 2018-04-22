@@ -12,6 +12,7 @@
 #include "state_functions.h"
 #include "../utils/utils.h"
 #include "../globals.h"
+#include "../controllers/us_sensor.h"
 
 void start_state_machine(){
     volatile StateFunc current_state = boot;
@@ -19,8 +20,13 @@ void start_state_machine(){
         if(PORTD & 0x80){
             CONF_FLAG = 0x1;
         }
+        if(US_ACTIVE){
+            if((int) check_trigger()){
+                US_FLAG = 0x1;
+            }
+        }
         current_state = (StateFunc)(*current_state)();
-        _delay(1000);
+        _delay(100);
     }
 
     display_string(3, "Out of loop");
