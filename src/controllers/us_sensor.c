@@ -12,19 +12,19 @@
 
 void arm_us(){
     ALARM_DISTANCE = measure_dist();
-    int current_measure;
-    do{
-        current_measure = measure_dist();
-    } while ((current_measure + 15) >= ALARM_DISTANCE && ALARM_DISTANCE != 0);
-
-    if(ALARM_DISTANCE != 0){
-        CURRENT_STATE = ALARM_TRIGGERED;
-    }
-    //TODO - Call API controller
-
 }
 
 void disarm_us(){
     ALARM_DISTANCE = 0;
+}
+
+char check_trigger(void){
+    int dist = measure_dist();
+
+    if(dist + 15 < ALARM_DISTANCE && ALARM_DISTANCE != 0){
+        return 0x1;
+    }
+
+    return 0x0;
 }
 
