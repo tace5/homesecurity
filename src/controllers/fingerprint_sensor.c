@@ -158,6 +158,8 @@ uint8_t auth_chain(uint8_t *match_score){
 
         user_message("Authenticating", 14);
 
+        _delay(2500);
+
         uint8_t res_load = load_print_from_flash(CHAR_BUFFER_2);
         res_match = match_buffers(match_score);
     }
