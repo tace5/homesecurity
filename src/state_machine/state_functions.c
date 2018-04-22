@@ -51,6 +51,7 @@ void *config_mode(){
 
 void *wait_to_arm(){
     state_message("Waiting to      arm device", 26);
+    clr_user_message();
     //Enable config (I2C) interrupt
     //Enable fingerprint (UART) interrupt
     enable_fingerprint_interrupt();
@@ -78,14 +79,15 @@ void *wait_to_arm(){
 
 void *arming(){
     state_message("Arming device...", 16);
+    /*
     //Enable interrupts (maybe not needed)
     enable_fingerprint_interrupt();
-    //Authenticate user with fingerprint
+    //Authenticate user with fingerprint*/
     uint8_t success = authenticate();
 
     //Reset interrupt flag and disable interrupt
     FINGERPRINT_FLAG = 0x0;
-    disable_fingerprint_interrupt();
+    //disable_fingerprint_interrupt();
 
     //If successful
     if(success == 0x1){
@@ -107,36 +109,67 @@ void *armed(){
     clr_user_message();
     //Enable fingerprint (UART) interrupt
     //Enable US sensor interrupt
-
-    //Wait for interrupt
-
-    //Disable interrupts
-
+    if(ALARM_DISTANCE == 0){
+        arm_us();
+    }
+    enable_fingerprint_interrupt();
     //If interrupt flag set for US sensor
-    //return alarm_triggered;
+    //return alarm_triggered
+    if (US_FLAG == 0x1){
+        disable_fingerprint_interrupt();
+        US_FLAG = 0x0;
+        US_ACTIVE = 0x0;
+        disarm_us();
+        return alarm_triggered;
+    }
 
     //If interrupt flag set for fingerprint (UART)
-    //return disarming;
+    //return disarming
+    if (FINGERPRINT_FLAG == 0x1){
+        disable_fingerprint_interrupt();
+        FINGERPRINT_FLAG = 0x0;
+        return disarming;
+    }
+
     return armed;
 }
 
 void *disarming(){
     state_message("Disarming...", 12);
     //Authenticate users fingerprint
+    uint8_t success = authenticate();
 
     //If successful
     //Send disarmed message to users phone
     //Disarm US
     //return wait_to_arm;
+    if(success == 0x1){
+        ALARM_FLAG = 0x0;
+        US_FLAG = 0x0;
+        US_ACTIVE = 0x0;
+        disarm_us();
+        disable_fingerprint_interrupt();
+        FINGERPRINT_FLAG = 0x0;
+        clr_state_message();
+        user_message("DISARMED!!!", 11);
+        _delay(2000);
+        return wait_to_arm;
+    }
 
     //If unsuccessful
-
-    //If alarm has been triggered
-    //Send failed try message to users phone
-    //return alarm_triggered;
-
-    //If alarm hasn't been triggered
-    //return armed;
+    //  If alarm has been triggered
+    //      Send failed try message to users phone
+    //      return alarm_triggered;
+    //  If alarm hasn't been triggered
+    //      return armed;
+    if (success == 0x2){
+        user_message("Disarming failed", 16);
+        if(ALARM_FLAG == 0x1){
+            return alarm_triggered;
+        } else{
+            return armed;
+        }
+    }
 }
 
 void *alarm_triggered(){
@@ -144,6 +177,8 @@ void *alarm_triggered(){
     display_string(1, "ALARM!!!");
     display_string(2, "ALARM!!!");
     display_update();
+
+    ALARM_FLAG = 0x1;
     //Send alarm triggered message to users phone
     //Visual feedback
     //Enable fingerprint (UART) interrupt
