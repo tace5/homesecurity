@@ -158,6 +158,8 @@ void * volatile armed(){
     return armed;
 }
 
+static int counter = 0;
+
 void * volatile disarming(){
     display_string(0, "Disarming...");
     display_update();
@@ -170,6 +172,7 @@ void * volatile disarming(){
     //Disarm US
     //return wait_to_arm;
     if(success == 0x1){
+        counter = 0;
         summer_stop();
         set_alarm_flag(0);
         set_us_flag(0);
@@ -207,10 +210,18 @@ void * volatile alarm_triggered(){
     display_string(2, "ALARM!!!");
     display_update();
 
-    if(!get_alarm_flag()){
-        set_alarm_flag(1);
+    if(counter < 100){
+        counter++;
+    } else{
+        if(!get_alarm_flag()){
+            set_alarm_flag(1);
+        }
+        if(!(OC1CON & 0x8000)){
+            summer_trig();
+        }
     }
-    summer_trig();
+
+
 
     //Enable fingerprint (UART) interrupt
     enable_fingerprint_interrupt();

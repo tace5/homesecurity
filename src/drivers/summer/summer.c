@@ -23,8 +23,8 @@ void summer_trig() {
 }
 
 void summer_stop() {
-    T2CONCLR = 0x8000; // Enable Timer2
-    OC1CON = 0x0000; // Enable OC1
+    T2CONCLR = 0x8000; // Disable Timer2
+    OC1CON = 0x0000; // Disable OC1
 }
 
 void summer_isr() {
