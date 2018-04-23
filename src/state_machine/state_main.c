@@ -14,11 +14,11 @@
 #include "../globals.h"
 #include "../controllers/us_sensor.h"
 
-uint8_t FINGERPRINT_FLAG = 0x0;
-uint8_t CONF_FLAG = 0x0;
-uint8_t US_ACTIVE = 0x0;
-uint8_t US_FLAG = 0x0;
-uint8_t ALARM_FLAG = 0x0;
+volatile static uint8_t FINGERPRINT_FLAG = 0x0;
+volatile static uint8_t CONF_FLAG = 0x0;
+volatile static uint8_t US_ACTIVE = 0x0;
+volatile static uint8_t US_FLAG = 0x0;
+volatile static uint8_t ALARM_FLAG = 0x0;
 
 void start_state_machine(){
     volatile StateFunc current_state = boot;
@@ -32,7 +32,7 @@ void start_state_machine(){
             }
         }
         current_state = (StateFunc)(*current_state)();
-        _delay(100);
+        _delay(500);
     }
 
     display_string(3, "Out of loop");

@@ -55,9 +55,12 @@ int get_total_package_length(int data_length){
 }
 
 void enable_fingerprint_interrupt(){
-    INTCONSET = 0x4;
-    IECSET(0) = FINGER_TOUCH_INT;      // Enable INT2 interrupt
-    IPCSET(2) = 0x1F000000; // Set priority = 7 and sub = 3
+    if(!(IEC(0) & FINGER_TOUCH_INT)){
+        INTCONSET = 0x4;
+        IECSET(0) = FINGER_TOUCH_INT;      // Enable INT2 interrupt
+        IPCSET(2) = 0x1F000000; // Set priority = 7 and sub = 3
+        set_finger_flag(0);
+    }
 }
 
 void disable_fingerprint_interrupt(){

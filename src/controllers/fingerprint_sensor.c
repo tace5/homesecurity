@@ -24,15 +24,11 @@ char scan_finger(uint8_t buffer_id){
     }
 
     if(success == 0x1) {
-        user_message("1st", 3);
         uint8_t res_to_buffer;
         do {
-            user_message("2nd", 3);
             uint8_t res_scan;
             do {
-                user_message("3rd", 3);
                 res_scan = scan_print();
-                user_message("4th", 3);
                 if (res_scan == RES_NO_FINGER) {
                     user_message("No finger", 9);
                 } else if (res_scan == RES_ENROLLMENT_FAIL) {
@@ -99,7 +95,7 @@ uint8_t enroll_print_2nd(){
 
         uint8_t res_model = generate_print_model();
         if(res_model == RES_COMBINE_FAIL){
-            user_message("Not the same    Finger, redo", 28);
+            user_message("Not the same  Finger, redo", 26);
             return 0x2;
         } else if(res_model == RES_RECEIVE_FAIL){
             msg_request_err();
@@ -178,7 +174,7 @@ uint8_t authenticate(){
     uint8_t res_match = auth_chain(match_score);
 
     if(res_match == RES_MATCH_FAIL){
-        user_message("Fingers DONT    match!", 22);
+        user_message("Fingers DONT   match!", 21);
         _delay(500);
         return 0x2;
     } else if(res_match == RES_SUCCESS){
@@ -199,7 +195,7 @@ uint8_t arm_alarm(){
         uint8_t res_match = auth_chain(match_score);
 
         if(res_match == RES_MATCH_FAIL){
-            user_message("Fingers DONT    match!", 22);
+            user_message("Fingers DONT   match!", 21);
             _delay(500);
             return 0x2;
         } else if(res_match == RES_SUCCESS){
@@ -209,7 +205,7 @@ uint8_t arm_alarm(){
             return 0x0;
         }
     } else if(print_check == RES_TEMPLATE_ERROR){
-        user_message("No print        available!", 26);
+        user_message("No print       available!", 25);
         return 0x3;
     } else{
         user_message("Data error", 10);
@@ -222,7 +218,7 @@ uint8_t disarm(){
     uint8_t res_match = auth_chain(match_score);
 
     if(res_match == RES_MATCH_FAIL){
-        user_message("Fingers DONT    match!", 22);
+        user_message("Fingers DONT   match!", 21);
         _delay(500);
         return 0x2;
     } else if(res_match == RES_SUCCESS){

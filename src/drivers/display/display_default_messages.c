@@ -6,19 +6,19 @@
 
 
 void user_message(char * message, int len){
-    if(len < 17){
+    if(len <= 15){
         display_string(2, message);
-        display_string(3, "                ");
+        display_string(3, "               ");
     } else{
         int i;
         int j;
-        char mes1[16];
-        char mes2[16];
-        for (i = 0; i < 16; ++i) {
+        char mes1[15];
+        char mes2[15];
+        for (i = 0; i < 15; i++) {
             mes1[i] = message[i];
         }
-        for (j = 16; j < len; ++j) {
-            mes2[j - 16] = message[j];
+        for (j = 15; j < len; j++) {
+            mes2[j - 15] = message[j];
         }
         display_string(2, mes1);
         display_string(3, mes2);
@@ -28,25 +28,25 @@ void user_message(char * message, int len){
 }
 
 void clr_user_message(){
-    display_string(2, "                ");
-    display_string(3, "                ");
+    display_string(2, "               ");
+    display_string(3, "               ");
     display_update();
 }
 
 void state_message(char * message, int len){
-    if(len < 17){
+    if(len <= 15){
         display_string(0, message);
-        display_string(1, "                ");
+        display_string(1, "               ");
     } else{
         int i;
         int j;
-        char mes1[16];
-        char mes2[16];
-        for (i = 0; i < 16; ++i) {
+        char mes1[15];
+        char mes2[15];
+        for (i = 0; i < 15; i++) {
             mes1[i] = message[i];
         }
-        for (j = 16; j < len; ++j) {
-            mes2[j - 16] = message[j];
+        for (j = 15; j < len; j++) {
+            mes2[j - 15] = message[j];
         }
         display_string(0, mes1);
         display_string(1, mes2);
@@ -56,8 +56,8 @@ void state_message(char * message, int len){
 }
 
 void clr_state_message(){
-    display_string(0, "                ");
-    display_string(1, "                ");
+    display_string(0, "               ");
+    display_string(1, "               ");
     display_update();
 }
 

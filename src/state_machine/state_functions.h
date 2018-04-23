@@ -5,23 +5,23 @@
 #ifndef HOMESECURITY_STATE_FUNCTIONS_H
 #define HOMESECURITY_STATE_FUNCTIONS_H
 
-typedef void *(*StateFunc)();
+typedef void * volatile (*StateFunc)();
 
-void *boot();
+void * volatile boot();
 
-void *wait_for_api();
+void * volatile wait_for_api();
 
-void *config_mode();
+void * volatile config_mode();
 
-void *wait_to_arm();
+void * volatile wait_to_arm();
 
-void *arming();
+void * volatile arming();
 
-void *armed();
+void * volatile armed();
 
-void *disarming();
+void * volatile disarming();
 
-void *alarm_triggered();
+void * volatile alarm_triggered();
 
 
 #include "state_functions.c"

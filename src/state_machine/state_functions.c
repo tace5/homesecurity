@@ -12,7 +12,7 @@
 #include "../drivers/summer/summer.h"
 #include "../controllers/us_sensor.h"
 
-void *boot(){
+void * volatile boot(){
     //If config is already set by talking to fingerprint sensor.
     char status = check_for_stored_print();
     if (status == 0x1) {
@@ -22,7 +22,7 @@ void *boot(){
     }
 }
 
-void *wait_for_api(){
+void * volatile wait_for_api(){
     state_message("Waiting for API", 15);
     //Enable config (I2C) interrupt
 
@@ -35,8 +35,10 @@ void *wait_for_api(){
     return config_mode;
 }
 
-void *config_mode(){
-    state_message("Configuration   Mode", 20);
+void * volatile config_mode(){
+    display_string(0, "Configuration");
+    display_string(1, "Mode");
+    display_update();
     _delay(1500);
 
     //Register fingerprint
@@ -47,15 +49,18 @@ void *config_mode(){
         _delay(500);
         return wait_to_arm;
     } else{
-        user_message("Failed!!!       Try again", 25);
+        user_message("Failed!!!      Try again", 24);
         _delay(1000);
         return config_mode;
     }
 }
 
-void *wait_to_arm(){
-    state_message("Waiting to      arm device", 26);
-    clr_user_message();
+void * volatile wait_to_arm(){
+    display_string(0, "Waiting to");
+    display_string(1, "arm device");
+    display_update();
+    //state_message("Waiting to     arm device", 25);
+    //clr_user_message();
     _delay(1000);
     //Enable config (I2C) interrupt
     //Enable fingerprint (UART) interrupt
@@ -71,9 +76,6 @@ void *wait_to_arm(){
         //If interrupt flag set for fingerprint (UART)
         if(get_finger_flag()){
             set_finger_flag(0);
-            int test = get_finger_flag();
-            display_debug(1, &test);
-            _delay(5000);
             return arming;
         }//If interrupt flag set for config (I2C)
         else if(get_conf_flag()){
@@ -85,8 +87,9 @@ void *wait_to_arm(){
     return wait_to_arm;
 }
 
-void *arming(){
-    state_message("Arming device...", 16);
+void * volatile arming(){
+    display_string(0, "Arming device..");
+    display_update();
     _delay(1000);
     /*
     //Enable interrupts (maybe not needed)
@@ -100,12 +103,12 @@ void *arming(){
 
     //If successful
     if(success == 0x1){
-        user_message("Alarm will arm  in 10 sec!", 26);
+        user_message("Alarm will arm in 10 sec!", 25);
         _delay(10000);
         return armed;
     } //If fingers dont match
     else if(success == 0x2){
-        user_message("Prints don't    match!!!", 24);
+        user_message("Prints don't   match!!!", 23);
         _delay(1500);
         return wait_to_arm;
     } //If request fail
@@ -113,13 +116,13 @@ void *arming(){
         _delay(1500);
         return wait_to_arm;
     }
-
-    user_message("Unreachable", 11);
-    _delay(5000);
 }
 
-void *armed(){
-    state_message("DEVICE IS       ARMED!!!", 24);
+void * volatile armed(){
+    display_string(0, "DEVICE IS");
+    display_string(1, "ARMED!!!");
+    display_update();
+
     clr_user_message();
     _delay(2000);
     //Enable fingerprint (UART) interrupt
@@ -127,7 +130,10 @@ void *armed(){
     if(ALARM_DISTANCE == 0){
         arm_us();
     }
+
     enable_fingerprint_interrupt();
+
+    _delay(2000);
     //If interrupt flag set for US sensor
     //return alarm_triggered
     if (get_us_flag()){
@@ -149,8 +155,9 @@ void *armed(){
     return armed;
 }
 
-void *disarming(){
-    state_message("Disarming...", 12);
+void * volatile disarming(){
+    display_string(0, "Disarming...");
+    display_update();
     _delay(1000);
     //Authenticate users fingerprint
     uint8_t success = authenticate();
@@ -180,7 +187,7 @@ void *disarming(){
     //  If alarm hasn't been triggered
     //      return armed;
     if (success == 0x2){
-        user_message("Disarming failed", 16);
+        user_message("Disarm Failed", 13);
         if(get_alarm_flag()){
             return alarm_triggered;
         } else{
@@ -191,11 +198,13 @@ void *disarming(){
     return disarming;
 }
 
-void *alarm_triggered(){
+void * volatile alarm_triggered(){
     display_string(0, "ALARM!!!");
     display_string(1, "ALARM!!!");
     display_string(2, "ALARM!!!");
     display_update();
+
+    _delay(5000);
 
     set_alarm_flag(1);
     summer_trig();
