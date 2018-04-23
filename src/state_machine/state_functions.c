@@ -39,14 +39,15 @@ void * volatile config_mode(){
     display_string(0, "Configuration");
     display_string(1, "Mode");
     display_update();
-    _delay(1500);
+    _delay(500);
 
     //Register fingerprint
     uint8_t enrolled = enroll_finger();
 
     if(enrolled){
         user_message("Success!!!", 10);
-        _delay(500);
+        _delay(1500);
+        set_conf_flag(0);
         return wait_to_arm;
     } else{
         user_message("Failed!!!      Try again", 24);
@@ -58,6 +59,8 @@ void * volatile config_mode(){
 void * volatile wait_to_arm(){
     display_string(0, "Waiting to");
     display_string(1, "arm device");
+    display_string(2, "");
+    display_string(3, "");
     display_update();
     //state_message("Waiting to     arm device", 25);
     //clr_user_message();
@@ -123,10 +126,9 @@ void * volatile arming(){
 void * volatile armed(){
     display_string(0, "DEVICE IS");
     display_string(1, "ARMED!!!");
+    display_string(2, "");
+    display_string(3, "");
     display_update();
-
-    clr_user_message();
-    _delay(2000);
     //Enable fingerprint (UART) interrupt
     //Enable US sensor interrupt
     if(ALARM_DISTANCE == 0){
@@ -135,7 +137,6 @@ void * volatile armed(){
 
     enable_fingerprint_interrupt();
 
-    _delay(2000);
     //If interrupt flag set for US sensor
     //return alarm_triggered
     if (get_us_flag()){
@@ -206,9 +207,9 @@ void * volatile alarm_triggered(){
     display_string(2, "ALARM!!!");
     display_update();
 
-    _delay(5000);
-
-    set_alarm_flag(1);
+    if(!get_alarm_flag()){
+        set_alarm_flag(1);
+    }
     summer_trig();
 
     //Enable fingerprint (UART) interrupt
