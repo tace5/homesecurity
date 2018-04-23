@@ -73,14 +73,15 @@ void * volatile wait_to_arm(){
 
         msg_finger_on_sensor(0x0);
 
-        //If interrupt flag set for fingerprint (UART)
-        if(get_finger_flag()){
+        //If interrupt flag set for config (I2C)
+        if(get_conf_flag()){
             set_finger_flag(0);
-            return arming;
-        }//If interrupt flag set for config (I2C)
-        else if(get_conf_flag()){
             set_conf_flag(0);
             return config_mode;
+        }//If interrupt flag set for fingerprint (UART)
+        else if(get_finger_flag()){
+            set_finger_flag(0);
+            return arming;
         }
     }
 
@@ -105,6 +106,7 @@ void * volatile arming(){
     if(success == 0x1){
         user_message("Alarm will arm in 10 sec!", 25);
         _delay(10000);
+        set_us_active_flag(1);
         return armed;
     } //If fingers dont match
     else if(success == 0x2){

@@ -32,7 +32,7 @@ void start_state_machine(){
             }
         }
         current_state = (StateFunc)(*current_state)();
-        _delay(500);
+        _delay(100);
     }
 
     display_string(3, "Out of loop");
